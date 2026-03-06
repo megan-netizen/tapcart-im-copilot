@@ -1,0 +1,8 @@
+{
+  "name": "tapcart-im-copilot",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  }
+}
