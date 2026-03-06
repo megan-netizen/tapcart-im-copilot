@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Tapcart IM Copilot</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #f5f5f7;
+  --surface: #ffffff;
+  --surface2: #f0f0f4;
+  --surface3: #e8e8ee;
+  --border: #d8d8e0;
+  --border2: #c8c8d4;
+  --accent: #6c6ef7;
+  --accent-dim: rgba(108,110,247,0.08);
+  --accent-glow: rgba(108,110,247,0.15);
+  --green: #16a34a;
+  --green-dim: rgba(22,163,74,0.08);
+  --red: #dc2626;
+  --red-dim: rgba(220,38,38,0.06);
+  --text: #1a1a2e;
+  --text2: #5a5a72;
+  --text3: #8888a0;
+  --r: 12px;
+  --r-sm: 8px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:32px 16px 64px}
+.wrap{width:100%;max-width:760px;position:relative;z-index:1}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;padding:0 2px}
+.header-left{display:flex;align-items:center;gap:14px}
+.logo{width:42px;height:42px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-weight:500;font-size:12px;color:#fff;letter-spacing:-0.5px;box-shadow:0 2px 12px var(--accent-glow)}
+.header-title{font-size:18px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
+.header-sub{font-size:12px;color:var(--text3);margin-top:2px;font-weight:400}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:28px 30px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+label{display:block;font-size:11px;font-weight:600;color:var(--text3);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:6px}
+.lopt{font-weight:400;color:var(--text3);text-transform:none;letter-spacing:0;font-size:10px}
+input,textarea,select{width:100%;padding:10px 13px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--surface);color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .15s}
+input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+textarea{line-height:1.7;resize:vertical;background:var(--surface2)}
+select{cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238888a0' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;background-color:var(--surface)}
+input::placeholder,textarea::placeholder{color:var(--text3)}
+.field{margin-bottom:18px}
+.hint{font-size:12px;color:var(--text3);margin-bottom:7px;line-height:1.5}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+.hr{border:none;border-top:1px solid var(--border);margin:22px 0}
+.section-label{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:24px}
+.tpill{padding:10px 8px;border:1px solid var(--border);border-radius:var(--r-sm);font-size:12px;font-weight:600;cursor:pointer;background:var(--surface);color:var(--text2);font-family:'DM Sans',sans-serif;transition:all .15s;text-align:center;white-space:nowrap}
+.tpill:hover{border-color:var(--border2);color:var(--text);background:var(--surface2)}
+.tpill.on{background:var(--accent-dim);color:var(--accent);border-color:var(--accent);box-shadow:0 0 0 3px rgba(108,110,247,0.08)}
+.edge-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
+.epill{padding:5px 12px;border:1px solid var(--border);border-radius:20px;font-size:11px;font-weight:500;cursor:pointer;background:transparent;color:var(--text3);font-family:'DM Sans',sans-serif;transition:all .15s}
+.epill:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
+.btn{padding:10px 20px;background:var(--accent);color:#fff;border:none;border-radius:var(--r-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:#5b5de6;box-shadow:0 4px 16px var(--accent-glow)}
+.btn:disabled{opacity:0.5;cursor:not-allowed}
+.btn-ghost{padding:9px 16px;background:transparent;border:1px solid var(--border2);color:var(--text2);border-radius:var(--r-sm);font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+.btn-sm{padding:7px 14px;font-size:12px}
+.btn-full{width:100%;padding:14px;font-size:14px;font-weight:700;border-radius:var(--r-sm);justify-content:center;margin-top:6px}
+.btn-ok{background:var(--green-dim)!important;color:var(--green)!important;border:1px solid rgba(22,163,74,0.25)!important}
+.btn-dim{background:var(--surface2);color:var(--text2);border:1px solid var(--border)}
+.btn-dim:hover{background:var(--surface3);color:var(--text);border-color:var(--accent)}
+.err{color:var(--red);font-size:13px;margin-bottom:12px;padding:10px 14px;background:var(--red-dim);border:1px solid rgba(220,38,38,0.15);border-radius:var(--r-sm)}
+.loading-wrap{display:flex;flex-direction:column;align-items:center;padding:80px 0;gap:20px}
+.spin{width:36px;height:36px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:sp .8s linear infinite}
+.ltext{font-size:14px;color:var(--text2)}
+.lsub{font-size:12px;color:var(--text3)}
+@keyframes sp{to{transform:rotate(360deg)}}
+.output-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px}
+.om{font-size:20px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
+.ot{font-size:12px;color:var(--text3);margin-top:3px;font-family:'DM Mono',monospace}
+.ibox{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:14px 16px;margin-bottom:16px}
+.ilabel{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px}
+.ipills{display:flex;flex-wrap:wrap;gap:6px}
+.ipill{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;background:var(--green-dim);border:1px solid rgba(22,163,74,0.15);border-radius:20px;font-size:11px;color:var(--green);font-weight:500}
+.idot{width:5px;height:5px;border-radius:50%;background:var(--green)}
+.sbar{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px;position:sticky;top:12px;z-index:10}
+.subj{font-size:13px;color:var(--text2);min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'DM Mono',monospace}
+.sv{color:var(--text);font-weight:500}
+.ebody{min-height:400px;padding:24px 26px;background:#fff;border-radius:var(--r-sm);font-size:14px;line-height:1.75;color:#1a1a1a;font-family:Arial,sans-serif;outline:none;border:1px solid var(--border)}
+.ebody p{margin:0 0 10px;font-family:Arial,sans-serif;font-size:14px}
+.ebody ul{margin:6px 0 10px 22px;list-style-type:disc}
+.ebody ul ul{list-style-type:circle;margin-top:4px}
+.ebody ol{margin:6px 0 10px 22px}
+.ebody li{margin-bottom:5px;font-family:Arial,sans-serif;font-size:14px}
+.ebody b{color:#1a1a1a}
+.ebody a{color:#4f46e5}
+.ehint{font-size:11px;color:var(--text3);margin-top:6px;text-align:right}
+.fhint{text-align:center;font-size:11px;color:var(--text3);margin-top:12px;font-family:'DM Mono',monospace}
+@keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.fi{animation:fu .25s ease}
+[data-h]{display:none!important}
+.time-row{display:flex;gap:8px}
+.time-row input[type="date"]{flex:1.6}
+.time-row select{flex:1}
+.landing{text-align:center;padding:40px 0 20px}
+.landing-icon{font-size:48px;margin-bottom:16px}
+.landing-title{font-size:24px;font-weight:700;letter-spacing:-0.5px;margin-bottom:6px}
+.landing-sub{font-size:14px;color:var(--text2);margin-bottom:32px;max-width:440px;margin-left:auto;margin-right:auto;line-height:1.6}
+.landing-divider{display:flex;align-items:center;gap:16px;margin:24px 0;color:var(--text3);font-size:12px;font-weight:500}
+.landing-divider::before,.landing-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.momentum-block{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:16px;margin-bottom:16px;text-align:left}
+.momentum-row{display:flex;align-items:center;gap:10px}
+.momentum-row input{flex:1}
+.momentum-status{font-size:12px;color:var(--text2);margin-top:10px;padding:8px 10px;background:var(--surface3);border-radius:6px;display:none}
+.momentum-status.show{display:block}
+.detected-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:var(--green-dim);border:1px solid rgba(22,163,74,0.15);border-radius:20px;font-size:12px;color:var(--green);font-weight:600;margin-bottom:16px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="header">
+  <div class="header-left">
+    <div class="logo">TC</div>
+    <div>
+      <div class="header-title">IM Copilot</div>
+      <div class="header-sub">Tapcart · Implementation email generator</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SCREEN 1: LANDING ═══════════════ -->
+<div id="S1" class="card fi">
+  <div class="landing">
+    <div class="landing-icon">📋</div>
+    <div class="landing-title">Start with a transcript</div>
+    <div class="landing-sub">Paste a call transcript or pull one from Momentum. The email type will be auto-detected and you'll be taken to the right template.</div>
+  </div>
+
+  <div class="g2" style="margin-bottom:16px">
+    <div class="field" style="margin-bottom:0"><label>Merchant Name</label><input id="mName1" placeholder="e.g. Longevity Rx"/></div>
+    <div></div>
+  </div>
+
+  <!-- Momentum Pull -->
+  <div class="momentum-block">
+    <div class="section-label" style="margin-bottom:10px">Pull from Momentum</div>
+    <div class="momentum-row">
+      <input id="momentumSearch" placeholder="Search by merchant name or meeting title..."/>
+      <button class="btn btn-sm btn-dim" id="momentumBtn" onclick="fetchMomentum()">⚡ Fetch</button>
+    </div>
+    <div class="momentum-status" id="momentumStatus"></div>
+  </div>
+
+  <div class="landing-divider">or paste manually</div>
+
+  <div class="field">
+    <label>Call Transcript *</label>
+    <textarea id="t-landing" rows="10" placeholder="Paste your Granola, Momentum, or any call transcript here..."></textarea>
+  </div>
+
+  <div id="landingErr" class="err" data-h></div>
+  <button class="btn btn-full" id="analyzeBtn" onclick="analyzeTranscript()">✦ Analyze & Continue</button>
+  <div class="fhint">Auto-detects: kickoff · submission · go live · quality · handoff · recap</div>
+</div>
+
+<!-- ═══════════════ SCREEN 2: COMPOSE ═══════════════ -->
+<div id="S2" data-h class="card fi">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+    <div id="detectedBadge" class="detected-badge"></div>
+    <button class="btn-ghost btn-sm" onclick="backToLanding()">← Back</button>
+  </div>
+
+  <div class="section-label">Email Type <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:10px;color:var(--text3)">(change if needed)</span></div>
+  <div class="type-grid">
+    <button class="tpill" data-t="kickoff"    onclick="selType(this)">📋 Post Kickoff</button>
+    <button class="tpill" data-t="submission" onclick="selType(this)">📱 App Submission</button>
+    <button class="tpill" data-t="golive"     onclick="selType(this)">🚀 Go Live</button>
+    <button class="tpill" data-t="quality"    onclick="selType(this)">✅ Post Quality Call</button>
+    <button class="tpill" data-t="handoff"    onclick="selType(this)">🤝 Handoff</button>
+    <button class="tpill" data-t="recap"      onclick="selType(this)">📝 Call Recap</button>
+  </div>
+
+  <div class="section-label">Edge Case Templates</div>
+  <div class="edge-row">
+    <button class="epill" onclick="loadEdge('noshow')">👻 No-show</button>
+    <button class="epill" onclick="loadEdge('stalled')">🔄 Stalled</button>
+    <button class="epill" onclick="loadEdge('escalation')">🚨 Escalation</button>
+    <button class="epill" onclick="loadEdge('delay')">⏳ Delay</button>
+    <button class="epill" onclick="loadEdge('reengagement')">💬 Re-engage</button>
+    <button class="epill" onclick="loadEdge('feedback')">⭐ Feedback</button>
+  </div>
+
+  <hr class="hr"/>
+
+  <div class="g2">
+    <div class="field"><label>Merchant Name *</label><input id="mName" placeholder="e.g. Longevity Rx"/></div>
+    <div class="field"><label>First Name <span class="lopt">(greeting)</span></label><input id="fName" placeholder="e.g. Emily"/></div>
+  </div>
+
+  <div class="field" id="sdField">
+    <label id="sdLabel">Next Call Date <span class="lopt">(optional)</span></label>
+    <div class="time-row">
+      <input id="sDate" type="date"/>
+      <select id="sTime_h"><option value="">Hr</option><option value="00">12 AM</option><option value="01">1 AM</option><option value="02">2 AM</option><option value="03">3 AM</option><option value="04">4 AM</option><option value="05">5 AM</option><option value="06">6 AM</option><option value="07">7 AM</option><option value="08">8 AM</option><option value="09">9 AM</option><option value="10">10 AM</option><option value="11">11 AM</option><option value="12">12 PM</option><option value="13">1 PM</option><option value="14">2 PM</option><option value="15">3 PM</option><option value="16">4 PM</option><option value="17">5 PM</option><option value="18">6 PM</option><option value="19">7 PM</option><option value="20">8 PM</option><option value="21">9 PM</option><option value="22">10 PM</option><option value="23">11 PM</option></select>
+      <select id="sTime_m"><option value="">Min</option><option value="00">:00</option><option value="15">:15</option><option value="30">:30</option><option value="45">:45</option></select>
+    </div>
+  </div>
+
+  <div id="f-kickoff" data-h>
+    <div class="field"><label>Call Transcript</label><textarea id="t-kickoff" rows="8"></textarea></div>
+  </div>
+  <div id="f-submission" data-h>
+    <div class="field"><label>Platform(s) Submitted</label><select id="subPlat"><option value="both">iOS &amp; Android</option><option value="ios">iOS only</option><option value="android">Android only</option></select></div>
+    <div class="field"><label>iOS Public Beta Link <span class="lopt">(optional)</span></label><input id="subBeta" placeholder="https://apps.apple.com/.../testflight"/></div>
+    <div class="field"><label>Android APK Link <span class="lopt">(optional)</span></label><input id="subApk" placeholder="https://play.google.com/apps/testing/..."/></div>
+    <div class="field"><label>Pending Items / Notes <span class="lopt">(optional)</span></label><textarea id="subNotes" rows="4" placeholder="e.g. Waiting on Firebase credentials..."></textarea></div>
+  </div>
+  <div id="f-golive" data-h>
+    <div class="field"><label>Tapcart Plan</label><select id="glType"><option value="enterprise">Enterprise</option><option value="selfservice">Self Service</option></select></div>
+    <div class="g2">
+      <div class="field"><label>iOS Download Link <span class="lopt">(optional)</span></label><input id="glIos" placeholder="https://apps.apple.com/..."/></div>
+      <div class="field"><label>Android Download Link <span class="lopt">(optional)</span></label><input id="glAnd" placeholder="https://play.google.com/..."/></div>
+    </div>
+    <div class="field"><label>Magic Link <span class="lopt">(optional)</span></label><input id="glMagic" placeholder="https://tapcart.app.link/..."/></div>
+    <div class="field"><label>Quality Call Date &amp; Time <span class="lopt">(optional)</span></label>
+      <div class="time-row">
+        <input id="glQDate" type="date"/>
+        <select id="glQTime_h"><option value="">Hr</option><option value="00">12 AM</option><option value="01">1 AM</option><option value="02">2 AM</option><option value="03">3 AM</option><option value="04">4 AM</option><option value="05">5 AM</option><option value="06">6 AM</option><option value="07">7 AM</option><option value="08">8 AM</option><option value="09">9 AM</option><option value="10">10 AM</option><option value="11">11 AM</option><option value="12">12 PM</option><option value="13">1 PM</option><option value="14">2 PM</option><option value="15">3 PM</option><option value="16">4 PM</option><option value="17">5 PM</option><option value="18">6 PM</option><option value="19">7 PM</option><option value="20">8 PM</option><option value="21">9 PM</option><option value="22">10 PM</option><option value="23">11 PM</option></select>
+        <select id="glQTime_m"><option value="">Min</option><option value="00">:00</option><option value="15">:15</option><option value="30">:30</option><option value="45">:45</option></select>
+      </div>
+    </div>
+    <div class="field"><label>Notes <span class="lopt">(optional)</span></label><textarea id="glNotes" rows="3"></textarea></div>
+  </div>
+  <div id="f-handoff" data-h>
+    <div class="field"><label>Account Manager Name *</label><input id="hoAM" placeholder="e.g. Sarah Johnson"/></div>
+    <div class="field"><label>Hard Launch Date <span class="lopt">(optional)</span></label><input id="hoDate" type="date"/></div>
+    <div class="field"><label>Items completing before handoff <span class="lopt">(optional)</span></label><textarea id="hoItems" rows="4" placeholder="e.g. Final Firebase config..."></textarea></div>
+  </div>
+  <div id="f-quality" data-h>
+    <div class="field"><label>Call Transcript / Notes</label><textarea id="t-quality" rows="8"></textarea></div>
+  </div>
+  <div id="f-recap" data-h>
+    <div class="field"><label>Call Type</label><select id="rcType"><option>Weekly Check-in</option><option>Dashboard Training</option><option>Design Review</option><option>Technical Sync</option><option>Growth Strategy Call</option><option>Other</option></select></div>
+    <div class="field"><label>Recording Link <span class="lopt">(optional)</span></label><input id="rcRecording" placeholder="https://granola.so/recording/..."/></div>
+    <div class="field"><label>Transcript / Notes</label><textarea id="t-recap" rows="8"></textarea></div>
+  </div>
+  <div id="f-edge" data-h>
+    <div class="field"><label>Context / Notes <span class="lopt">(optional)</span></label><div class="hint" id="edgeHint"></div><textarea id="t-edge" rows="6"></textarea></div>
+  </div>
+
+  <div id="IE" class="err" data-h></div>
+  <button class="btn btn-full" onclick="gen()">✦ Generate Email</button>
+  <div class="fhint" id="FH"></div>
+</div>
+
+<!-- ═══════════════ LOADING ═══════════════ -->
+<div id="LV" data-h>
+  <div class="card">
+    <div class="loading-wrap">
+      <div class="spin"></div>
+      <div class="ltext" id="LT">Analyzing transcript...</div>
+      <div class="lsub" id="LS"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SCREEN 3: OUTPUT ═══════════════ -->
+<div id="OV" data-h class="fi">
+  <div class="output-header">
+    <div><div class="om" id="OM"></div><div class="ot" id="OT"></div></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn-ghost btn-sm" onclick="backToCompose()">← Edit</button>
+      <button class="btn-ghost btn-sm" onclick="backToLanding()">New</button>
+    </div>
+  </div>
+  <div id="IB" class="ibox" data-h>
+    <div class="ilabel">Integrations Detected</div>
+    <div id="IP" class="ipills"></div>
+  </div>
+  <div class="sbar">
+    <div class="subj">Subject: <span class="sv" id="OS"></span></div>
+    <button class="btn btn-sm" id="CB" onclick="cp()">📋 Copy</button>
+  </div>
+  <div class="ebody" id="EB" contenteditable="true"></div>
+  <div class="ehint">Click to edit · Links are live</div>
+</div>
+
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const v=id=>$(id)?.value?.trim()??'';
+const show=id=>$(id)?.removeAttribute('data-h');
+const hide=id=>$(id)?.setAttribute('data-h','');
+let ct='kickoff', edgeType=null, transcriptText='';
+
+function backToLanding(){hide('S2');hide('OV');hide('LV');show('S1');}
+function backToCompose(){hide('OV');show('S2');}
+
+// ── MOMENTUM (via server proxy) ───────────────────────────────────────────────
+async function fetchMomentum(){
+  const search = $('momentumSearch').value.trim() || v('mName1');
+  if(!search){$('momentumStatus').textContent='Enter a merchant name or search term.';$('momentumStatus').style.color='var(--red)';$('momentumStatus').classList.add('show');return;}
+  $('momentumBtn').textContent='Fetching...';$('momentumBtn').disabled=true;$('momentumStatus').classList.remove('show');
+  try{
+    const res=await fetch('/api/momentum');
+    if(!res.ok){const e=await res.json();throw new Error(e.error||'Momentum error '+res.status);}
+    const data=await res.json();
+    const meetings=data.meetings||[];
+    const ml=search.toLowerCase();
+    const match=meetings.find(m=>m.title?.toLowerCase().includes(ml)||m.attendees?.some(a=>a.name?.toLowerCase().includes(ml)||a.email?.toLowerCase().includes(ml)))||meetings[0];
+    if(!match){$('momentumStatus').textContent=`No meetings found matching "${search}".`;$('momentumStatus').style.color='var(--text2)';$('momentumStatus').classList.add('show');return;}
+    let transcript='';
+    if(match.transcript?.entries?.length){transcript=match.transcript.entries.map(e=>`${e.speaker?.name||'Speaker'}: ${e.text}`).join('\n');}
+    if(transcript){
+      $('t-landing').value=transcript;
+      if(!v('mName1')&&match.attendees){const ext=match.attendees.find(a=>!a.isInternal);if(ext)$('mName1').value=ext.company||ext.name?.split(' ').slice(-1)[0]||'';}
+      const d=match.startTime?new Date(match.startTime).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'';
+      $('momentumStatus').innerHTML=`✓ Loaded "<b>${match.title||'Meeting'}</b>"${d?' · '+d:''}`;
+      $('momentumStatus').style.color='var(--green)';
+    }else{$('momentumStatus').textContent='Meeting found but no transcript yet.';$('momentumStatus').style.color='var(--text2)';}
+    $('momentumStatus').classList.add('show');
+  }catch(e){$('momentumStatus').textContent=e.message;$('momentumStatus').style.color='var(--red)';$('momentumStatus').classList.add('show');}
+  $('momentumBtn').textContent='⚡ Fetch';$('momentumBtn').disabled=false;
+}
+
+// ── ANALYZE ───────────────────────────────────────────────────────────────────
+async function analyzeTranscript(){
+  transcriptText=v('t-landing');
+  if(!transcriptText){$('landingErr').textContent='Paste a transcript or fetch one from Momentum first.';show('landingErr');return;}
+  hide('landingErr');
+  const btn=$('analyzeBtn');btn.textContent='✦ Detecting...';btn.disabled=true;
+  let detected='kickoff';
+  try{
+    const res=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:50,messages:[{role:'user',content:`Which Tapcart IM email type fits this transcript? Reply with ONLY one word from: kickoff, submission, golive, quality, handoff, recap\n\nTranscript:\n${transcriptText.slice(0,3000)}`}]})});
+    const data=await res.json();
+    const d=data.content?.[0]?.text?.trim().toLowerCase().replace(/[^a-z]/g,'');
+    if(['kickoff','submission','golive','quality','handoff','recap'].includes(d))detected=d;
+  }catch(e){}
+  btn.textContent='✦ Analyze & Continue';btn.disabled=false;
+  ct=detected;edgeType=null;goToCompose(detected);
+}
+
+const TYPE_LABELS={kickoff:'Post Kickoff',submission:'App Submission',golive:'Go Live',quality:'Post Quality Call',handoff:'Handoff',recap:'Call Recap'};
+
+function goToCompose(type){
+  hide('S1');
+  $('detectedBadge').innerHTML=`✦ Detected: <b>${TYPE_LABELS[type]||type}</b>`;
+  document.querySelectorAll('.tpill').forEach(p=>p.classList.toggle('on',p.dataset.t===type));
+  ['kickoff','submission','golive','quality','handoff','recap','edge'].forEach(t=>t===type?show('f-'+t):hide('f-'+t));
+  const tt={kickoff:'t-kickoff',quality:'t-quality',recap:'t-recap'};
+  if(tt[type])$(tt[type]).value=transcriptText;
+  if(v('mName1'))$('mName').value=v('mName1');
+  const DL={kickoff:'Dashboard Training Date',submission:'Next Call Date',quality:'Hard Launch Date',recap:'Next Call Date'};
+  $('sdLabel').innerHTML=(DL[type]||'Next Call Date')+' <span class="lopt">(optional)</span>';
+  (type==='handoff'||type==='golive'||type==='submission')?hide('sdField'):show('sdField');
+  show('S2');$('S2').scrollIntoView({behavior:'smooth'});
+}
+
+function selType(btn){
+  document.querySelectorAll('.tpill').forEach(p=>p.classList.remove('on'));btn.classList.add('on');
+  ct=btn.dataset.t;edgeType=null;
+  ['kickoff','submission','golive','quality','handoff','recap','edge'].forEach(t=>t===ct?show('f-'+t):hide('f-'+t));
+  const DL={kickoff:'Dashboard Training Date',submission:'Next Call Date',quality:'Hard Launch Date',recap:'Next Call Date'};
+  $('sdLabel').innerHTML=(DL[ct]||'Next Call Date')+' <span class="lopt">(optional)</span>';
+  (ct==='handoff'||ct==='golive'||ct==='submission')?hide('sdField'):show('sdField');
+  $('detectedBadge').innerHTML=`✦ Selected: <b>${TYPE_LABELS[ct]||ct}</b>`;
+  const tt={kickoff:'t-kickoff',quality:'t-quality',recap:'t-recap'};
+  if(tt[ct]&&!v(tt[ct])&&transcriptText)$(tt[ct]).value=transcriptText;
+}
+
+const EDGE_META={noshow:{label:'No-show Follow-up',hint:'When was the meeting? How many times rescheduled?'},stalled:{label:'Stalled Merchant',hint:'Where are they stuck? Last touchpoint?'},escalation:{label:'Escalation',hint:'What went wrong? What does the merchant need?'},delay:{label:'Launch Delay',hint:'What is causing the delay? New timeline?'},reengagement:{label:'Re-engagement',hint:'How long unresponsive? Last known status?'},feedback:{label:'Positive Feedback',hint:'What did they say? Any specific praise?'}};
+
+function loadEdge(type){
+  edgeType=type;ct='edge';
+  document.querySelectorAll('.tpill').forEach(p=>p.classList.remove('on'));
+  ['kickoff','submission','golive','quality','handoff','recap','edge'].forEach(t=>t==='edge'?show('f-'+t):hide('f-'+t));
+  show('sdField');$('sdLabel').innerHTML='Next Call Date <span class="lopt">(optional)</span>';
+  const m=EDGE_META[type];$('edgeHint').textContent=m.hint;$('detectedBadge').innerHTML=`✦ Template: <b>${m.label}</b>`;$('t-edge').placeholder=m.hint;$('t-edge').value='';
+}
+
+// ── INTEGRATION TEMPLATES ─────────────────────────────────────────────────────
+const ITPL=`Appsflyer: Please invite team@tapcart.co to your Appsflyer dashboard and confirm once access has been granted.
+Branch: Follow [these steps](https://help.tapcart.com/en/articles/11120304-branch-tapcart) to configure Branch in your Tapcart dashboard.
+Facebook: Complete [these steps](https://help.tapcart.com/en/articles/11120285-facebook-sdk-tapcart-part-1-2) to connect your Meta Developer account.
+Firebase: We will configure Firebase once you create a project using [these steps](https://help.tapcart.com/en/articles/11120306-firebase-analytics-tapcart).
+Algolia: Use [these steps](https://help.tapcart.com/en/articles/11120321-algolia-tapcart) to configure Algolia search & merchandising.
+Digioh: Follow these steps to create and implement your Digioh quiz.
+Fast Simon: Provide your UUID, Store ID, and Domain Name so we can enable this integration.
+KnoCommerce: Use [these steps](https://help.tapcart.com/en/articles/11120394-knocommerce-tapcart) to set up your post purchase survey.
+Nosto Recommendations: Contact your Nosto rep for the API key and send it to us to enable.
+Nosto Search: Use [these steps](https://help.tapcart.com/en/articles/11120326-nosto-tapcart) to enable in your app.
+Searchanise: Provide your Searchanise API key to enable this feature.
+Rebuy: Provide your Rebuy API key, or enable on your own using [these steps](https://help.tapcart.com/en/articles/11120328-rebuy-tapcart).
+Searchspring: Use [these steps](https://help.tapcart.com/en/articles/11120330-searchspring-tapcart) to enable search & merchandising.
+Swym Wishlist Plus: Provide your API Key, Endpoint, and PID. If you can't locate these, reach out to Swym support.
+Kimonix: Follow these steps to enable search & merchandising.
+Octane AI: Provide your quiz URL or follow these instructions to set up quizzes.
+AfterShip: Provide your Shopify Store ID to get this connected.
+OrderProtection: Confirm your Shopify Store Domain and we will enable this for you.
+Redo: No information needed. Just ensure Redo is enabled in the Tapcart Sales channel.
+Route: Provide your Route Merchant ID and Product ID of the insurance product.
+ShipInsure: Provide your Shopify ID to get this connected.
+Braze: Use [these steps](https://help.tapcart.com/en/articles/11120387-braze-tapcart) to activate in your dashboard.
+Klaviyo Reviews: Confirm your Company ID and we will activate this.
+Iterable: Follow [these steps](https://help.tapcart.com/en/articles/11120391-iterable-tapcart) to activate Iterable push notifications.
+Klaviyo: Invite team@tapcart.co as an Editor to your Klaviyo account. We'll configure and build your automated flows for you to review before launch.
+Bloomreach: Use [these steps](https://help.tapcart.com/en/articles/11120388-bloomreach-tapcart) to set up Bloomreach push notifications.
+Attentive Push: Follow these steps to set up Attentive push notifications.
+Reviews.io: No information needed. We will enable this for you.
+TrustSpot: Provide your TrustSpot API key to enable reviews.
+Stamped Reviews: Provide your Stamped Public Key, Secret Key, and Store Hash.
+Loox: No information needed. We will enable this for you.
+Junip: Provide your Junip Store key to enable reviews.
+Judge.me: Provide your Shopify Domain URL and Public API Token.
+Okendo Reviews: Provide your Okendo User ID to enable reviews.
+Yotpo Reviews: Provide your Yotpo App Key to enable reviews.
+Yotpo UGC: Provide your Yotpo App Key and Album Name to enable UGC.
+Foursixty: Provide your Foursixty Page ID to enable UGC.
+CreatorCommerce: Provide your Channel ID to enable affiliate portals.
+Recharge: Contact your Recharge rep for your API key, or request it [here](https://help.tapcart.com/en/articles/11120454-recharge-tapcart).
+Skio: Use [these instructions](https://help.tapcart.com/en/articles/11120456-skio-tapcart) to activate Skio subscriptions.
+Stay.ai: Use these instructions to activate Stay AI subscriptions.
+Ordergroove: Use [these instructions](https://help.tapcart.com/en/articles/11120457-ordergroove-tapcart) to activate Ordergroove subscriptions.
+Bubblehouse Loyalty: Use these steps to activate your Bubblehouse loyalty program.
+LoyaltyLion: Provide your LoyaltyLion API Key, Site ID, Web URL, and whether to display Point Balance or Reward Points.
+Okendo Loyalty: Provide your Okendo User ID to enable loyalty.
+Rivo: Provide your Rivo API Key to enable loyalty.
+Smile.io: Provide your Smile.io API Key, Web URL, and whether to display Point Balance or Reward Points.
+Talkable: Follow these steps to configure and activate referrals.
+Inveterate: Follow [these steps](https://help.tapcart.com/en/articles/11120510-inveterate-tapcart) to activate rewards.
+LyveCom: Provide your LyveCom Account ID to activate live shopping.
+Tolstoy: Provide your Tolstoy App Key to activate shoppable videos.
+Gorgias: Provide your Gorgias Application ID to activate chat.
+Zowie: Provide your Zowie Instance ID to activate chat.
+BOGOS: I will follow up with you on next steps for activating BOGOS.
+Abra: Use these steps to activate your Abra promotion. Once done, let me know and I'll activate it in your dashboard.`;
+
+// ── MARKDOWN → HTML ───────────────────────────────────────────────────────────
+function mdToHtml(md){
+  const SH=t=>`<p><b style="font-size:16px">${t}</b> <span style="color:#ccc">&#9135;&#9135;&#9135;&#9135;&#9135;&#9135;&#9135;&#9135;&#9135;&#9135;&#9135;&#9135;&#9135;&#9135;&#9135;</span></p>`;
+  const lines=md.split('\n');let html='',inUl=false,inOl=false,depth=0;
+  const closeList=()=>{if(inUl){html+='</ul>';inUl=false;}if(inOl){html+='</ol>';inOl=false;}depth=0;};
+  const il=s=>s.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2">$1</a>');
+  for(const raw of lines){const line=raw.trimEnd();if(!line.trim()){closeList();html+='<p></p>';continue;}
+  if(/^## (.+)/.test(line)){closeList();html+=SH(il(line.replace(/^## /,'')));continue;}
+  if(/^\*\*[^*]+:\*\*$/.test(line.trim())){closeList();html+=`<p>${il(line.trim())}</p>`;continue;}
+  if(/^\d+\. /.test(line.trim())){if(!inOl){if(inUl){html+='</ul>';inUl=false;}html+='<ol>';inOl=true;}html+=`<li>${il(line.replace(/^\d+\. /,''))}</li>`;continue;}
+  const bm=line.match(/^(\s*)[-*] (.+)/);if(bm){const nd=bm[1].length>0?1:0;if(!inUl||nd!==depth){if(inUl&&nd>depth)html+='<ul>';else if(inUl&&nd<depth)html+='</ul>';else if(!inUl){if(inOl){html+='</ol>';inOl=false;}html+='<ul>';inUl=true;}depth=nd;}html+=`<li>${il(bm[2])}</li>`;continue;}
+  closeList();html+=`<p>${il(line.trim())}</p>`;}closeList();
+  return `<div style="font-family:Arial,sans-serif;font-size:14px;color:#1a1a1a;">${html}</div>`;
+}
+
+// ── SYSTEM PROMPTS ────────────────────────────────────────────────────────────
+function getEdgeSys(type){
+  const base=`You are a Tapcart Implementation Manager writing a follow-up email to a merchant. First person, warm, genuine, concise. No filler. Never show raw URLs. always use markdown links [text](url).\n\nOutput ONLY in this exact format. No extra text:\nSUBJECT: [subject line]\nINTEGRATIONS: NONE\n---\n[email body in markdown]\n\nMARKDOWN RULES: ## for headers, **bold**, - bullets, [text](url) for links, blank lines between paragraphs.`;
+  const p={noshow:base+`\n\nTASK: Follow-up email after a no-show. Warm and non-judgmental.\nKeep it under 6 sentences total.`,stalled:base+`\n\nTASK: Re-engagement email for a merchant who has gone quiet.\nKeep it concise.`,escalation:base+`\n\nTASK: Escalation or issue acknowledgment. Calm, accountable, solution-focused.`,delay:base+`\n\nTASK: Launch delay email. Transparent, proactive, reassuring.`,reengagement:base+`\n\nTASK: Re-engagement for a merchant who has gone dark. Light, no guilt-trip.`,feedback:base+`\n\nTASK: Response to positive feedback. Warm, genuine.\nSoft ask for [Shopify review](https://apps.shopify.com/tapcart).`};
+  return p[type]||base;
+}
+
+function getSys(type){
+  if(type==='edge')return getEdgeSys(edgeType);
+  const base=`You are a Tapcart Implementation Manager writing follow-up emails to merchants. First person, warm, concise. No filler. Never say "your IM". Never show raw URLs. always use markdown links [text](url).\n\nOutput ONLY in this exact format. No extra text:\nSUBJECT: [subject line]\nINTEGRATIONS: [comma-separated list of detected integration names, or NONE]\n---\n[email body in markdown]\n\nMARKDOWN RULES:\n- ## Heading\n- **bold text**\n- - bullet item\n  - indented bullet\n- [link text](url)\n- Blank line between paragraphs\nKeep output lean.`;
+
+  if(type==='kickoff')return base+`\n\nTASK: Post-kickoff follow-up email.\n\nINTEGRATION RULES:\n- Only include integrations with a matching template below\n- Use template wording exactly\n- If completed live: "✅ **Completed** - [next step]"\n- No template: skip from Integrations, add to Tapcart next steps\n\nSTRUCTURE:\nWarm opening.\n\n## Integrations\nOne bullet per integration.\n\n## Developer Account Setup\n(ONLY if discussed:)\n- DUNS not started: [these steps](https://help.tapcart.com/en/articles/13800686-d-u-n-s-number) then enroll:\n  - Apple: [enrollment](https://help.tapcart.com/en/articles/13798875-inviting-tapcart-to-your-apple-developer-account)\n  - Google Play: [enrollment](https://play.google.com/console/u/0/developers/)\n- Apple approved: invite via [steps](https://help.tapcart.com/en/articles/13798875-inviting-tapcart-to-your-apple-developer-account)\n- Google Play approved: [Console](https://play.google.com/console/u/0/developers/) → Users and Permissions → Invite team@tapcart.co as Administrator\n- Never reference a welcome email\n\n## Next Steps\n**[Company name]:**\n- [merchant items]\n\n**Tapcart:**\n- [Tapcart items]\n\nClosing: bold next call date if mentioned.\n\nINTEGRATION TEMPLATES:\n${ITPL}`;
+
+  if(type==='submission')return base+`\n\nTASK: App submission follow-up.\nConfirm submitted, unpublished until green light.\nInclude test links if provided.\nAfter links: "Please take some time to test the app and send over any feedback. Before launch, we'll run one final build to incorporate any updates from testing and make sure everything is finalized for release."\nIf pending items, add ## Pending Items.`;
+
+  if(type==='golive')return base+`\n\nTASK: Go live email.\nENTERPRISE: "Congratulations! Your app is now live! 🎉"\n## 📲 Download Your App (links if provided, magic link if provided)\n## ✅ Next Steps\nStep 1: [Quality Checklist](https://drive.google.com/file/d/1TiSNqbKQlVGHwIhbI9AZf-LVbWxEECRO/view?usp=sharing)\nStep 2: Quality Call (use date or ask to book)\nStep 3: Early Ratings\n## 📚 Bonus Resources\n[Tapcart Academy](https://academy.tapcart.com) · [UnTapped](https://www.tapcart.com/untapped)\n\nSELF SERVICE: Simpler version with [QA checklist](https://drive.google.com/file/d/12aQKlMoQTOJ4IxQ5NjWqz_nuzJiflkud/view?usp=sharing), [Growth Deck](https://drive.google.com/file/d/1wUrDI_DpsqqZ5JLwvDUsxIcJJWtn1xLv/view?usp=sharing), Get Help in [dashboard](https://app.tapcart.com/page/home), [Academy](https://academy.tapcart.com). Ask for [Shopify review](https://apps.shopify.com/tapcart).`;
+
+  if(type==='quality')return base+`\n\nTASK: Post-quality call email.\n## Hard Launch\n- **Target Date:** [from transcript or TBD]\n- **Blockers:** [if any]\n## Next Steps\n**[Company]:** / **Tapcart:**\nBold the hard launch date in closing.`;
+
+  if(type==='handoff')return base+`\n\nTASK: Handoff email. Celebratory.\nIf outstanding items, list them.\n## Next Steps\n⭐️ [Shopify review](https://apps.shopify.com/tapcart)\n📝 [Survey](https://www.tapcart.com)\n💰 Refer & Earn\nAM [name] is new contact. Support via [dashboard](https://app.tapcart.com/page/home).`;
+
+  if(type==='recap')return base+`\n\nTASK: Call recap.\nRules: no duplicate items between What We Covered and Action Items. Use company name. Bold next call date. Include recording link if provided.\nDev account logic if discussed (same as kickoff).\nDashboard Training: one bullet about [dashboard](https://app.tapcart.com/page/home) walkthrough + [Design Help](https://help.tapcart.com/en/collections/12574991-designing-your-app).\n## What We Covered\n## Developer Account Setup (if discussed)\n## Action Items\n**[Company]:** / **Tapcart:**`;
+}
+
+// ── BUILD & VALIDATE ──────────────────────────────────────────────────────────
+function fmtDate(dId,tId){
+  const dv=v(dId);if(!dv)return '';const d=new Date(dv+'T12:00:00');if(isNaN(d))return dv;
+  const dp=d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  if(!tId)return dp;const h=v(tId+'_h'),m=v(tId+'_m');if(!h)return dp;
+  const hi=parseInt(h,10),mi=m?parseInt(m,10):0,ap=hi>=12?'PM':'AM',h12=hi%12||12;
+  return `${dp} at ${mi===0?h12+' '+ap:h12+':'+String(mi).padStart(2,'0')+' '+ap}`;
+}
+
+function buildMsg(){
+  const m=v('mName'),fn=v('fName')||m.split(' ')[0],d=fmtDate('sDate','sTime');
+  let msg=`Merchant: ${m}`;if(fn)msg+=`\nFirst Name: ${fn}`;if(d)msg+=`\nNext Call Date: ${d}`;
+  if(ct==='kickoff')msg+=`\n\nTRANSCRIPT:\n${v('t-kickoff')}`;
+  if(ct==='submission'){msg+=`\nPlatform: ${v('subPlat')}`;if(v('subBeta'))msg+=`\niOS Public Beta: ${v('subBeta')}`;if(v('subApk'))msg+=`\nAndroid APK: ${v('subApk')}`;if(v('subNotes'))msg+=`\n\nPending Items:\n${v('subNotes')}`;}
+  if(ct==='golive'){msg+=`\nPlan: ${v('glType')==='selfservice'?'Self Service':'Enterprise'}`;if(v('glIos'))msg+=`\niOS: ${v('glIos')}`;if(v('glAnd'))msg+=`\nAndroid: ${v('glAnd')}`;if(v('glMagic'))msg+=`\nMagic Link: ${v('glMagic')}`;const qd=fmtDate('glQDate','glQTime');if(qd)msg+=`\nQuality Call: ${qd}`;if(v('glNotes'))msg+=`\nNotes: ${v('glNotes')}`;}
+  if(ct==='quality')msg+=`\n\nTRANSCRIPT:\n${v('t-quality')}`;
+  if(ct==='handoff'){if(v('hoAM'))msg+=`\nAM: ${v('hoAM')}`;const hd=fmtDate('hoDate',null);if(hd)msg+=`\nLaunch: ${hd}`;if(v('hoItems'))msg+=`\n\nOutstanding:\n${v('hoItems')}`;}
+  if(ct==='recap'){msg+=`\nCall Type: ${v('rcType')}`;if(v('rcRecording'))msg+=`\nRecording: ${v('rcRecording')}`;msg+=`\n\nNOTES:\n${v('t-recap')}`;}
+  if(ct==='edge'){if(edgeType)msg+=`\nTemplate: ${EDGE_META[edgeType]?.label||edgeType}`;if(v('t-edge'))msg+=`\nContext:\n${v('t-edge')}`;}
+  return msg;
+}
+
+function chk(){
+  if(!v('mName'))return 'Please enter the merchant name.';
+  if(ct==='kickoff'&&!v('t-kickoff'))return 'Paste the call transcript.';
+  if(ct==='quality'&&!v('t-quality'))return 'Paste the call transcript or notes.';
+  if(ct==='recap'&&!v('t-recap'))return 'Paste the transcript or notes.';
+  if(ct==='edge'&&!edgeType)return 'Select an edge case template.';
+  return null;
+}
+
+const TL={kickoff:'Post Kickoff Email',submission:'App Submission Email',golive:'Go Live Email',quality:'Post Quality Call Email',handoff:'Handoff Email',recap:'Call Recap Email',edge:'Email'};
+const LM={kickoff:'Analyzing transcript...',submission:'Drafting email...',golive:'Drafting email...',quality:'Drafting email...',handoff:'Drafting email...',recap:'Drafting recap...',edge:'Drafting email...'};
+const LSM={kickoff:'Detecting integrations and next steps',submission:'Building follow-up',golive:'Writing launch email',quality:'Reviewing feedback',handoff:'Wrapping up implementation',recap:'Summarizing call',edge:'Personalizing template'};
+
+async function gen(){
+  const e=chk();if(e){$('IE').textContent=e;show('IE');return;}
+  hide('IE');hide('S2');$('LT').textContent=LM[ct]||'Generating...';$('LS').textContent=LSM[ct]||'';show('LV');
+  try{
+    const res=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:8192,stream:true,system:getSys(ct),messages:[{role:'user',content:buildMsg()}]})});
+    if(!res.ok){const err=await res.json();throw new Error(err.error?.message||res.statusText);}
+    hide('LV');$('OM').textContent=v('mName');$('OT').textContent=TL[ct]||'';hide('IB');$('OS').textContent='';
+    $('EB').innerHTML='<span style="color:#bbb">Writing...</span>';$('CB').textContent='📋 Copy';$('CB').classList.remove('btn-ok');show('OV');
+    const reader=res.body.getReader(),dec=new TextDecoder();let buf='',full='',bodyStarted=false;
+    while(true){const{done,value}=await reader.read();if(done)break;buf+=dec.decode(value,{stream:true});
+    const lines=buf.split('\n');buf=lines.pop();
+    for(const line of lines){if(!line.startsWith('data: '))continue;const chunk=line.slice(6).trim();if(chunk==='[DONE]')continue;
+    try{const ev=JSON.parse(chunk);if(ev.type==='content_block_delta'&&ev.delta?.type==='text_delta'){full+=ev.delta.text;if(!bodyStarted&&full.includes('\n---\n'))bodyStarted=true;if(bodyStarted){const bm=full.slice(full.indexOf('\n---\n')+5);if(bm.trim())$('EB').innerHTML=mdToHtml(bm);}}}catch(e){}}}
+    const sm=full.match(/SUBJECT:\s*(.+)/),im=full.match(/INTEGRATIONS:\s*(.+)/),di=full.indexOf('\n---\n'),bm=di>-1?full.slice(di+5):full;
+    $('OS').textContent=sm?sm[1].trim():'';$('EB').innerHTML=mdToHtml(bm);
+    if(im&&im[1].trim().toUpperCase()!=='NONE'){const ints=im[1].split(',').map(s=>s.trim()).filter(Boolean);if(ints.length){$('IP').innerHTML=ints.map(n=>`<span class="ipill"><span class="idot"></span>${n}</span>`).join('');show('IB');}}
+  }catch(e){hide('LV');hide('OV');show('S2');$('IE').textContent='Error: '+e.message;show('IE');}
+}
+
+function cp(){const el=$('EB'),r=document.createRange();r.selectNodeContents(el);const s=window.getSelection();s.removeAllRanges();s.addRange(r);document.execCommand('copy');s.removeAllRanges();$('CB').textContent='Copied!';$('CB').classList.add('btn-ok');setTimeout(()=>{$('CB').textContent='📋 Copy';$('CB').classList.remove('btn-ok');},2000);}
+</script>
+</body>
+</html>
