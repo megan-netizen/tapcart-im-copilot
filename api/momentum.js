@@ -9,7 +9,13 @@ export default async function handler(req, res) {
   }
 
   try {
-    const response = await fetch('https://api.momentum.io/v1/meetings?limit=10', {
+    // Default to last 30 days if no 'from' provided
+    const from = req.query.from || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+    const limit = req.query.limit || 20;
+
+    const url = `https://api.momentum.io/v1/meetings?from=${encodeURIComponent(from)}&limit=${limit}`;
+
+    const response = await fetch(url, {
       headers: { 'X-API-Key': key }
     });
 
