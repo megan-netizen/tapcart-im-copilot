@@ -131,7 +131,7 @@ input::placeholder,textarea::placeholder{color:var(--text3)}
   <div class="landing">
     <div class="landing-icon">📋</div>
     <div class="landing-title">Start with a transcript</div>
-    <div class="landing-sub">Paste a call transcript or pull one from Momentum. The email type will be auto-detected and you'll be taken to the right template.</div>
+    <div class="landing-sub">Paste a call transcript or pull one from Momentum, then select your email type on the next screen.</div>
   </div>
 
   <div class="g2" style="margin-bottom:16px">
@@ -157,8 +157,8 @@ input::placeholder,textarea::placeholder{color:var(--text3)}
   </div>
 
   <div id="landingErr" class="err" data-h></div>
-  <button class="btn btn-full" id="analyzeBtn" onclick="analyzeTranscript()">✦ Analyze & Continue</button>
-  <div class="fhint">Auto-detects: kickoff · submission · go live · quality · handoff · recap</div>
+  <button class="btn btn-full" id="analyzeBtn" onclick="analyzeTranscript()">✦ Continue</button>
+  <div class="fhint">Select your email type on the next screen</div>
 </div>
 
 <!-- ═══════════════ SCREEN 2: COMPOSE ═══════════════ -->
@@ -335,16 +335,13 @@ async function analyzeTranscript(){
   transcriptText=v('t-landing');
   if(!transcriptText){$('landingErr').textContent='Paste a transcript or fetch one from Momentum first.';show('landingErr');return;}
   hide('landingErr');
-  const btn=$('analyzeBtn');btn.textContent='✦ Detecting...';btn.disabled=true;
-  let detected='kickoff';
-  try{
-    const res=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:50,messages:[{role:'user',content:`Which Tapcart IM email type fits this transcript? Reply with ONLY one word from: kickoff, submission, golive, quality, handoff, recap\n\nTranscript:\n${transcriptText.slice(0,3000)}`}]})});
-    const data=await res.json();
-    const d=data.content?.[0]?.text?.trim().toLowerCase().replace(/[^a-z]/g,'');
-    if(['kickoff','submission','golive','quality','handoff','recap'].includes(d))detected=d;
-  }catch(e){}
-  btn.textContent='✦ Analyze & Continue';btn.disabled=false;
-  ct=detected;edgeType=null;goToCompose(detected);
+  const btn=$('analyzeBtn');btn.textContent='✦ Continuing...';btn.disabled=true;
+
+  // Copy merchant name and transcript, go straight to compose
+  setTimeout(() => {
+    btn.textContent='✦ Continue';btn.disabled=false;
+    ct='kickoff';edgeType=null;goToCompose('kickoff');
+  }, 200);
 }
 
 const TYPE_LABELS={kickoff:'Post Kickoff',submission:'App Submission',golive:'Go Live',quality:'Post Quality Call',handoff:'Handoff',recap:'Call Recap'};
