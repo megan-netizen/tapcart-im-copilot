@@ -9,17 +9,21 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Default to last 14 days for speed — most searches are recent
-    const from = req.query.from || new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
     const search = (req.query.search || '').toLowerCase();
-    const maxPages = 20; // Cap at 1000 meetings max
+    const maxPages = 20;
+
+    // Fetch recent meetings by using a narrow window: last 14 days
+    const now = new Date();
+    const twoWeeksAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+    const from = req.query.from || twoWeeksAgo.toISOString();
+    const to = req.query.to || now.toISOString();
 
     let allMeetings = [];
     let pageNumber = 1;
     let totalPages = 1;
 
     while (pageNumber <= Math.min(totalPages, maxPages)) {
-      const url = `https://api.momentum.io/v1/meetings?from=${encodeURIComponent(from)}&pageSize=50&pageNumber=${pageNumber}`;
+      const url = `https://api.momentum.io/v1/meetings?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&pageSize=50&pageNumber=${pageNumber}`;
 
       const response = await fetch(url, {
         headers: { 'X-API-Key': key }
@@ -39,7 +43,7 @@ export default async function handler(req, res) {
 
       allMeetings = allMeetings.concat(meetings);
 
-      // If searching, check if we found a match — stop early
+      // If searching, stop early on match
       if (search) {
         const found = allMeetings.some(m =>
           (m.title || '').toLowerCase().includes(search) ||
