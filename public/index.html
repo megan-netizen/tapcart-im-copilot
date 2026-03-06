@@ -300,13 +300,21 @@ async function fetchMomentum(){
   if(!search){$('momentumStatus').textContent='Enter a merchant name or search term.';$('momentumStatus').style.color='var(--red)';$('momentumStatus').classList.add('show');return;}
   $('momentumBtn').textContent='Fetching...';$('momentumBtn').disabled=true;$('momentumStatus').classList.remove('show');
   try{
-    const res=await fetch('/api/momentum');
+    const from=new Date(Date.now()-90*24*60*60*1000).toISOString();
+    const res=await fetch(`/api/momentum?from=${encodeURIComponent(from)}&limit=50`);
     if(!res.ok){const e=await res.json();throw new Error(e.error||'Momentum error '+res.status);}
     const data=await res.json();
     const meetings=data.meetings||[];
     const ml=search.toLowerCase();
-    const match=meetings.find(m=>m.title?.toLowerCase().includes(ml)||m.attendees?.some(a=>a.name?.toLowerCase().includes(ml)||a.email?.toLowerCase().includes(ml)))||meetings[0];
-    if(!match){$('momentumStatus').textContent=`No meetings found matching "${search}".`;$('momentumStatus').style.color='var(--text2)';$('momentumStatus').classList.add('show');return;}
+    // Debug: log all meeting titles to help troubleshoot
+    console.log('Momentum meetings:', meetings.map(m=>({title:m.title, attendees:m.attendees?.map(a=>({name:a.name,email:a.email,company:a.company}))  })));
+    const match=meetings.find(m=>{
+      const t=m.title?.toLowerCase()||'';
+      const acc=m.account?.name?.toLowerCase()||'';
+      const atts=m.attendees||[];
+      return t.includes(ml)||acc.includes(ml)||atts.some(a=>(a.name||'').toLowerCase().includes(ml)||(a.email||'').toLowerCase().includes(ml)||(a.company||'').toLowerCase().includes(ml));
+    });
+    if(!match){$('momentumStatus').innerHTML=`No meetings matching "<b>${search}</b>" in last 90 days. ${meetings.length} meetings searched. <br><span style="font-size:11px;color:var(--text3)">Open browser console (F12) to see all meeting titles returned.</span>`;$('momentumStatus').style.color='var(--text2)';$('momentumStatus').classList.add('show');return;}
     let transcript='';
     if(match.transcript?.entries?.length){transcript=match.transcript.entries.map(e=>`${e.speaker?.name||'Speaker'}: ${e.text}`).join('\n');}
     if(transcript){
