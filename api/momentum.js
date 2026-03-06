@@ -9,39 +9,59 @@ export default async function handler(req, res) {
   }
 
   try {
-    const from = req.query.from || new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
+    // Default to last 14 days for speed — most searches are recent
+    const from = req.query.from || new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
     const search = (req.query.search || '').toLowerCase();
-    const pageNumber = parseInt(req.query.pageNumber) || 1;
-    const pageSize = parseInt(req.query.pageSize) || 50;
+    const maxPages = 20; // Cap at 1000 meetings max
 
-    const url = `https://api.momentum.io/v1/meetings?from=${encodeURIComponent(from)}&pageSize=${pageSize}&pageNumber=${pageNumber}`;
+    let allMeetings = [];
+    let pageNumber = 1;
+    let totalPages = 1;
 
-    const response = await fetch(url, {
-      headers: { 'X-API-Key': key }
-    });
+    while (pageNumber <= Math.min(totalPages, maxPages)) {
+      const url = `https://api.momentum.io/v1/meetings?from=${encodeURIComponent(from)}&pageSize=50&pageNumber=${pageNumber}`;
 
-    if (!response.ok) {
-      const text = await response.text();
-      return res.status(response.status).json({
-        error: `Momentum API error: ${response.status}`,
-        details: text
+      const response = await fetch(url, {
+        headers: { 'X-API-Key': key }
       });
+
+      if (!response.ok) {
+        const text = await response.text();
+        return res.status(response.status).json({
+          error: `Momentum API error: ${response.status}`,
+          details: text
+        });
+      }
+
+      const data = await response.json();
+      const meetings = data.meetings || [];
+      totalPages = data.pageCount || 1;
+
+      allMeetings = allMeetings.concat(meetings);
+
+      // If searching, check if we found a match — stop early
+      if (search) {
+        const found = allMeetings.some(m =>
+          (m.title || '').toLowerCase().includes(search) ||
+          (m.attendees || []).some(a =>
+            (a.name || '').toLowerCase().includes(search) ||
+            (a.email || '').toLowerCase().includes(search)
+          )
+        );
+        if (found) break;
+      }
+
+      pageNumber++;
     }
 
-    const data = await response.json();
+    // Sort newest first
+    allMeetings.sort((a, b) => new Date(b.startTime || 0) - new Date(a.startTime || 0));
 
-    // Return raw Momentum response + debug info
     return res.status(200).json({
-      debug: {
-        requestUrl: url,
-        rawPageCount: data.pageCount,
-        meetingsReturned: (data.meetings || []).length,
-        firstMeetingDate: data.meetings?.[0]?.startTime,
-        lastMeetingDate: data.meetings?.[data.meetings.length - 1]?.startTime,
-        allKeys: Object.keys(data)
-      },
-      meetings: data.meetings || [],
-      pageCount: data.pageCount
+      meetings: allMeetings,
+      totalFetched: allMeetings.length,
+      pagesFetched: pageNumber,
+      totalPagesAvailable: totalPages
     });
   } catch (err) {
     return res.status(500).json({ error: err.message });
