@@ -300,13 +300,13 @@ async function fetchMomentum(){
   if(!search){$('momentumStatus').textContent='Enter a merchant name or search term.';$('momentumStatus').style.color='var(--red)';$('momentumStatus').classList.add('show');return;}
   $('momentumBtn').textContent='Fetching...';$('momentumBtn').disabled=true;$('momentumStatus').classList.remove('show');
   try{
+    const ml=search.toLowerCase();
     const now=new Date().toISOString();
     const from=new Date(Date.now()-14*24*60*60*1000).toISOString();
     const res=await fetch(`/api/momentum?from=${encodeURIComponent(from)}&to=${encodeURIComponent(now)}&search=${encodeURIComponent(ml)}`);
     if(!res.ok){const e=await res.json();throw new Error(e.error||'Momentum error '+res.status);}
     const data=await res.json();
     const meetings=data.meetings||[];
-    const ml=search.toLowerCase();
     // Debug: log all meeting titles to help troubleshoot
     console.log('Momentum meetings:', meetings.map(m=>({title:m.title, attendees:m.attendees?.map(a=>({name:a.name,email:a.email,company:a.company}))  })));
     const match=meetings.find(m=>{
