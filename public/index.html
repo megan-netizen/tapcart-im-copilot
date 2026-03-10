@@ -7,22 +7,22 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
 :root {
-  --bg: #f5f5f7;
+  --bg: #FFFDF5;
   --surface: #ffffff;
-  --surface2: #f0f0f4;
-  --surface3: #e8e8ee;
-  --border: #d8d8e0;
-  --border2: #c8c8d4;
-  --accent: #6c6ef7;
-  --accent-dim: rgba(108,110,247,0.08);
-  --accent-glow: rgba(108,110,247,0.15);
-  --green: #16a34a;
-  --green-dim: rgba(22,163,74,0.08);
+  --surface2: #FEFCF3;
+  --surface3: #F7F3E8;
+  --border: #E8E2CC;
+  --border2: #D9D1B8;
+  --accent: #E2B714;
+  --accent-dim: rgba(226,183,20,0.10);
+  --accent-glow: rgba(226,183,20,0.20);
+  --green: #2D9F5B;
+  --green-dim: rgba(45,159,91,0.08);
   --red: #dc2626;
   --red-dim: rgba(220,38,38,0.06);
-  --text: #1a1a2e;
-  --text2: #5a5a72;
-  --text3: #8888a0;
+  --text: #1C1C14;
+  --text2: #5C5A4D;
+  --text3: #9C9880;
   --r: 12px;
   --r-sm: 8px;
 }
@@ -52,12 +52,12 @@ input::placeholder,textarea::placeholder{color:var(--text3)}
 .type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:24px}
 .tpill{padding:10px 8px;border:1px solid var(--border);border-radius:var(--r-sm);font-size:12px;font-weight:600;cursor:pointer;background:var(--surface);color:var(--text2);font-family:'DM Sans',sans-serif;transition:all .15s;text-align:center;white-space:nowrap}
 .tpill:hover{border-color:var(--border2);color:var(--text);background:var(--surface2)}
-.tpill.on{background:var(--accent-dim);color:var(--accent);border-color:var(--accent);box-shadow:0 0 0 3px rgba(108,110,247,0.08)}
+.tpill.on{background:var(--accent-dim);color:var(--accent);border-color:var(--accent);box-shadow:0 0 0 3px rgba(226,183,20,0.12)}
 .edge-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
 .epill{padding:5px 12px;border:1px solid var(--border);border-radius:20px;font-size:11px;font-weight:500;cursor:pointer;background:transparent;color:var(--text3);font-family:'DM Sans',sans-serif;transition:all .15s}
 .epill:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
 .btn{padding:10px 20px;background:var(--accent);color:#fff;border:none;border-radius:var(--r-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
-.btn:hover{background:#5b5de6;box-shadow:0 4px 16px var(--accent-glow)}
+.btn:hover{background:#C9A00F;box-shadow:0 4px 16px var(--accent-glow)}
 .btn:disabled{opacity:0.5;cursor:not-allowed}
 .btn-ghost{padding:9px 16px;background:transparent;border:1px solid var(--border2);color:var(--text2);border-radius:var(--r-sm);font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
 .btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
@@ -111,6 +111,14 @@ input::placeholder,textarea::placeholder{color:var(--text3)}
 .momentum-status{font-size:12px;color:var(--text2);margin-top:10px;padding:8px 10px;background:var(--surface3);border-radius:6px;display:none}
 .momentum-status.show{display:block}
 .detected-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:var(--green-dim);border:1px solid rgba(22,163,74,0.15);border-radius:20px;font-size:12px;color:var(--green);font-weight:600;margin-bottom:16px}
+.door-card{cursor:pointer;padding:28px;border:1.5px solid var(--border);border-radius:var(--r);text-align:center;background:var(--surface);transition:all .2s ease}
+.door-card:hover{border-color:var(--border2);background:#FFF8DC;box-shadow:0 6px 24px var(--accent-glow);transform:translateY(-2px)}
+.tmpl-card{cursor:pointer;padding:18px 20px;border:1.5px solid var(--border);border-radius:var(--r);background:var(--surface);transition:all .15s ease}
+.tmpl-card:hover{border-color:var(--border2);background:#FFF8DC;box-shadow:0 0 0 3px var(--accent-dim)}
+.refine-panel{background:var(--surface2);border:1.5px dashed var(--border2);border-radius:var(--r);padding:22px 24px;margin-top:16px}
+.tone-pill{padding:5px 14px;border:1px solid var(--border);border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;background:transparent;color:var(--text3);font-family:'DM Sans',sans-serif;transition:all .15s}
+.tone-pill:hover{border-color:var(--green);color:var(--green)}
+.tone-pill.on{background:var(--green-dim);color:var(--green);border-color:var(--green);font-weight:600}
 </style>
 </head>
 <body>
@@ -126,66 +134,86 @@ input::placeholder,textarea::placeholder{color:var(--text3)}
   </div>
 </div>
 
-<!-- ═══════════════ SCREEN 1: LANDING ═══════════════ -->
+<!-- ═══════════════ SCREEN 1: HOME (Two-Door) ═══════════════ -->
 <div id="S1" class="card fi">
   <div class="landing">
-    <div class="landing-icon">📋</div>
-    <div class="landing-title">Start with a transcript</div>
-    <div class="landing-sub">Paste a call transcript or pull one from Momentum, then select your email type on the next screen.</div>
+    <div class="landing-icon">✉️</div>
+    <div class="landing-title">What are you working on?</div>
+    <div class="landing-sub">Pick your starting point and we'll get you to a polished email fast.</div>
   </div>
 
-  <div class="g2" style="margin-bottom:16px">
-    <div class="field" style="margin-bottom:0"><label>Merchant Name</label><input id="mName1" placeholder="e.g. Longevity Rx"/></div>
-    <div></div>
-  </div>
-
-  <!-- Momentum Pull -->
-  <div class="momentum-block">
-    <div class="section-label" style="margin-bottom:10px">Pull from Momentum</div>
-    <div class="momentum-row">
-      <input id="momentumSearch" placeholder="Search by merchant name or meeting title..."/>
-      <button class="btn btn-sm btn-dim" id="momentumBtn" onclick="fetchMomentum()">⚡ Fetch</button>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:0">
+    <div class="door-card" onclick="openDoor('call')">
+      <div style="font-size:36px;margin-bottom:12px">📞</div>
+      <div style="font-size:16px;font-weight:700;margin-bottom:5px">Just had a call</div>
+      <div style="font-size:12px;color:var(--text3);line-height:1.5">Post-kickoff, quality call, or recap &mdash; bring a transcript</div>
     </div>
-    <div class="momentum-status" id="momentumStatus"></div>
+    <div class="door-card" onclick="openDoor('nocall')">
+      <div style="font-size:36px;margin-bottom:12px">✉️</div>
+      <div style="font-size:16px;font-weight:700;margin-bottom:5px">No call needed</div>
+      <div style="font-size:12px;color:var(--text3);line-height:1.5">App submission, go live, handoff &amp; edge cases</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SCREEN 1B: TEMPLATE SELECT ═══════════════ -->
+<div id="S1B" data-h class="card fi">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+    <div style="font-size:18px;font-weight:700" id="doorTitle">Which call?</div>
+    <button class="btn-ghost btn-sm" onclick="backToHome()">← Back</button>
   </div>
 
-  <div class="landing-divider">or paste manually</div>
-
-  <div class="field">
-    <label>Call Transcript *</label>
-    <textarea id="t-landing" rows="10" placeholder="Paste your Granola, Momentum, or any call transcript here..."></textarea>
+  <!-- Call templates -->
+  <div id="door-call" data-h>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div class="tmpl-card" onclick="pickTemplate('kickoff')">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px"><span style="font-size:20px">📋</span><span style="font-size:14px;font-weight:700">Post Kickoff</span></div>
+        <div style="font-size:11.5px;color:var(--text3);padding-left:30px">Follow-up with integrations &amp; next steps</div>
+      </div>
+      <div class="tmpl-card" onclick="pickTemplate('quality')">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px"><span style="font-size:20px">✅</span><span style="font-size:14px;font-weight:700">Post Quality Call</span></div>
+        <div style="font-size:11.5px;color:var(--text3);padding-left:30px">Hard launch date, blockers &amp; action items</div>
+      </div>
+      <div class="tmpl-card" onclick="pickTemplate('recap')">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px"><span style="font-size:20px">📝</span><span style="font-size:14px;font-weight:700">Call Recap</span></div>
+        <div style="font-size:11.5px;color:var(--text3);padding-left:30px">What we covered + action items</div>
+      </div>
+    </div>
   </div>
 
-  <div id="landingErr" class="err" data-h></div>
-  <button class="btn btn-full" id="analyzeBtn" onclick="analyzeTranscript()">✦ Continue</button>
-  <div class="fhint">Select your email type on the next screen</div>
+  <!-- No-call templates -->
+  <div id="door-nocall" data-h>
+    <div class="section-label">Core Templates</div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px">
+      <div class="tmpl-card" onclick="pickTemplate('submission')">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px"><span style="font-size:20px">📱</span><span style="font-size:14px;font-weight:700">App Submission</span></div>
+        <div style="font-size:11.5px;color:var(--text3);padding-left:30px">Confirm submission, test links &amp; pending items</div>
+      </div>
+      <div class="tmpl-card" onclick="pickTemplate('golive')">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px"><span style="font-size:20px">🚀</span><span style="font-size:14px;font-weight:700">Go Live</span></div>
+        <div style="font-size:11.5px;color:var(--text3);padding-left:30px">Launch email with download links &amp; resources</div>
+      </div>
+      <div class="tmpl-card" onclick="pickTemplate('handoff')">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px"><span style="font-size:20px">🤝</span><span style="font-size:14px;font-weight:700">Handoff</span></div>
+        <div style="font-size:11.5px;color:var(--text3);padding-left:30px">Transition to AM with outstanding items</div>
+      </div>
+    </div>
+
+    <div class="section-label">Edge Cases</div>
+    <div class="edge-row">
+      <button class="epill" onclick="pickTemplate('edge','noshow')">👻 No-Show</button>
+      <button class="epill" onclick="pickTemplate('edge','techescalation')">🚨 Tech Escalation</button>
+      <button class="epill" onclick="pickTemplate('edge','reengagement')">💬 Re-engage</button>
+      <button class="epill" onclick="pickTemplate('edge','feedback')">⭐ Feedback</button>
+    </div>
+  </div>
 </div>
 
 <!-- ═══════════════ SCREEN 2: COMPOSE ═══════════════ -->
 <div id="S2" data-h class="card fi">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
     <div id="detectedBadge" class="detected-badge"></div>
-    <button class="btn-ghost btn-sm" onclick="backToLanding()">← Back</button>
-  </div>
-
-  <div class="section-label">Email Type <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:10px;color:var(--text3)">(change if needed)</span></div>
-  <div class="type-grid">
-    <button class="tpill" data-t="kickoff"    onclick="selType(this)">📋 Post Kickoff</button>
-    <button class="tpill" data-t="submission" onclick="selType(this)">📱 App Submission</button>
-    <button class="tpill" data-t="golive"     onclick="selType(this)">🚀 Go Live</button>
-    <button class="tpill" data-t="quality"    onclick="selType(this)">✅ Post Quality Call</button>
-    <button class="tpill" data-t="handoff"    onclick="selType(this)">🤝 Handoff</button>
-    <button class="tpill" data-t="recap"      onclick="selType(this)">📝 Call Recap</button>
-  </div>
-
-  <div class="section-label">Edge Case Templates</div>
-  <div class="edge-row">
-    <button class="epill" onclick="loadEdge('noshow')">👻 No-show</button>
-    <button class="epill" onclick="loadEdge('stalled')">🔄 Stalled</button>
-    <button class="epill" onclick="loadEdge('escalation')">🚨 Escalation</button>
-    <button class="epill" onclick="loadEdge('delay')">⏳ Delay</button>
-    <button class="epill" onclick="loadEdge('reengagement')">💬 Re-engage</button>
-    <button class="epill" onclick="loadEdge('feedback')">⭐ Feedback</button>
+    <button class="btn-ghost btn-sm" onclick="backToSelect()">← Back</button>
   </div>
 
   <hr class="hr"/>
@@ -195,12 +223,26 @@ input::placeholder,textarea::placeholder{color:var(--text3)}
     <div class="field"><label>First Name <span class="lopt">(greeting)</span></label><input id="fName" placeholder="e.g. Emily"/></div>
   </div>
 
+  <!-- Momentum block for transcript types -->
+  <div id="momentumBlock" data-h>
+    <div class="momentum-block">
+      <div class="section-label" style="margin-bottom:10px">Pull from Momentum</div>
+      <div class="momentum-row">
+        <input id="momentumSearch" placeholder="Search by merchant name or meeting title..."/>
+        <button class="btn btn-sm btn-dim" id="momentumBtn" onclick="fetchMomentum()">⚡ Fetch</button>
+      </div>
+      <div class="momentum-status" id="momentumStatus"></div>
+    </div>
+    <div class="landing-divider">or paste manually</div>
+  </div>
+
   <div class="field" id="sdField">
     <label id="sdLabel">Next Call Date <span class="lopt">(optional)</span></label>
     <div class="time-row">
       <input id="sDate" type="date"/>
-      <select id="sTime_h"><option value="">Hr</option><option value="00">12 AM</option><option value="01">1 AM</option><option value="02">2 AM</option><option value="03">3 AM</option><option value="04">4 AM</option><option value="05">5 AM</option><option value="06">6 AM</option><option value="07">7 AM</option><option value="08">8 AM</option><option value="09">9 AM</option><option value="10">10 AM</option><option value="11">11 AM</option><option value="12">12 PM</option><option value="13">1 PM</option><option value="14">2 PM</option><option value="15">3 PM</option><option value="16">4 PM</option><option value="17">5 PM</option><option value="18">6 PM</option><option value="19">7 PM</option><option value="20">8 PM</option><option value="21">9 PM</option><option value="22">10 PM</option><option value="23">11 PM</option></select>
+      <select id="sTime_h"><option value="">Hr</option><option value="08">8 AM</option><option value="09">9 AM</option><option value="10">10 AM</option><option value="11">11 AM</option><option value="12">12 PM</option><option value="13">1 PM</option><option value="14">2 PM</option><option value="15">3 PM</option><option value="16">4 PM</option><option value="17">5 PM</option><option value="18">6 PM</option></select>
       <select id="sTime_m"><option value="">Min</option><option value="00">:00</option><option value="15">:15</option><option value="30">:30</option><option value="45">:45</option></select>
+      <select id="sTime_tz" style="flex:0.7"><option value="">TZ</option><option value="PT">PT</option><option value="MT">MT</option><option value="CT">CT</option><option value="ET">ET</option><option value="GMT">GMT</option><option value="CET">CET</option></select>
     </div>
   </div>
 
@@ -223,8 +265,9 @@ input::placeholder,textarea::placeholder{color:var(--text3)}
     <div class="field"><label>Quality Call Date &amp; Time <span class="lopt">(optional)</span></label>
       <div class="time-row">
         <input id="glQDate" type="date"/>
-        <select id="glQTime_h"><option value="">Hr</option><option value="00">12 AM</option><option value="01">1 AM</option><option value="02">2 AM</option><option value="03">3 AM</option><option value="04">4 AM</option><option value="05">5 AM</option><option value="06">6 AM</option><option value="07">7 AM</option><option value="08">8 AM</option><option value="09">9 AM</option><option value="10">10 AM</option><option value="11">11 AM</option><option value="12">12 PM</option><option value="13">1 PM</option><option value="14">2 PM</option><option value="15">3 PM</option><option value="16">4 PM</option><option value="17">5 PM</option><option value="18">6 PM</option><option value="19">7 PM</option><option value="20">8 PM</option><option value="21">9 PM</option><option value="22">10 PM</option><option value="23">11 PM</option></select>
+        <select id="glQTime_h"><option value="">Hr</option><option value="08">8 AM</option><option value="09">9 AM</option><option value="10">10 AM</option><option value="11">11 AM</option><option value="12">12 PM</option><option value="13">1 PM</option><option value="14">2 PM</option><option value="15">3 PM</option><option value="16">4 PM</option><option value="17">5 PM</option><option value="18">6 PM</option></select>
         <select id="glQTime_m"><option value="">Min</option><option value="00">:00</option><option value="15">:15</option><option value="30">:30</option><option value="45">:45</option></select>
+        <select id="glQTime_tz" style="flex:0.7"><option value="">TZ</option><option value="PT">PT</option><option value="MT">MT</option><option value="CT">CT</option><option value="ET">ET</option></select>
       </div>
     </div>
     <div class="field"><label>Notes <span class="lopt">(optional)</span></label><textarea id="glNotes" rows="3"></textarea></div>
@@ -268,7 +311,7 @@ input::placeholder,textarea::placeholder{color:var(--text3)}
     <div><div class="om" id="OM"></div><div class="ot" id="OT"></div></div>
     <div style="display:flex;gap:8px">
       <button class="btn-ghost btn-sm" onclick="backToCompose()">← Edit</button>
-      <button class="btn-ghost btn-sm" onclick="backToLanding()">New</button>
+      <button class="btn-ghost btn-sm" onclick="backToHome()">New</button>
     </div>
   </div>
   <div id="IB" class="ibox" data-h>
@@ -281,6 +324,28 @@ input::placeholder,textarea::placeholder{color:var(--text3)}
   </div>
   <div class="ebody" id="EB" contenteditable="true"></div>
   <div class="ehint">Click to edit · Links are live</div>
+
+  <!-- Regenerate panel -->
+  <div class="refine-panel">
+    <div class="section-label">Refine &amp; Regenerate</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+      <button class="tone-pill" onclick="toggleTone(this,'Warmer')">Warmer</button>
+      <button class="tone-pill" onclick="toggleTone(this,'More direct')">More direct</button>
+      <button class="tone-pill" onclick="toggleTone(this,'Shorter')">Shorter</button>
+      <button class="tone-pill" onclick="toggleTone(this,'More formal')">More formal</button>
+      <button class="tone-pill" onclick="toggleTone(this,'Softer')">Softer</button>
+    </div>
+    <div id="regenBasic">
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-full" onclick="regen()" style="flex:1">✦ Regenerate</button>
+        <button class="btn btn-dim" onclick="showFeedbackBox()" style="white-space:nowrap;padding:14px 18px;width:auto;margin-top:6px">+ Feedback</button>
+      </div>
+    </div>
+    <div id="regenFeedback" data-h>
+      <div class="field"><textarea id="regenNotes" rows="3" placeholder='e.g. "Make it shorter" or "Don&#39;t mention the delay" or "Add urgency around the dev account"'></textarea></div>
+      <button class="btn btn-full" onclick="regen()">✦ Regenerate with feedback</button>
+    </div>
+  </div>
 </div>
 
 </div>
@@ -289,14 +354,53 @@ const $=id=>document.getElementById(id);
 const v=id=>$(id)?.value?.trim()??'';
 const show=id=>$(id)?.removeAttribute('data-h');
 const hide=id=>$(id)?.setAttribute('data-h','');
-let ct='kickoff', edgeType=null, transcriptText='';
+let ct='kickoff', edgeType=null, transcriptText='', currentDoor=null, lastFullOutput='', selectedTones=[];
 
-function backToLanding(){hide('S2');hide('OV');hide('LV');show('S1');}
+// ── NAVIGATION ───────────────────────────────────────────────────────────────
+function backToHome(){hide('S1B');hide('S2');hide('OV');hide('LV');show('S1');}
+function backToSelect(){hide('S2');show('S1B');}
 function backToCompose(){hide('OV');show('S2');}
+
+function openDoor(door){
+  currentDoor=door;
+  hide('S1');
+  $('doorTitle').textContent=door==='call'?'Which call?':'Which template?';
+  if(door==='call'){show('door-call');hide('door-nocall');}
+  else{hide('door-call');show('door-nocall');}
+  show('S1B');
+}
+
+function pickTemplate(type, edgeId){
+  hide('S1B');
+  if(type==='edge'){
+    ct='edge';edgeType=edgeId;
+    const m=EDGE_META[edgeId];
+    $('detectedBadge').innerHTML='✦ Template: <b>'+m.label+'</b>';
+    $('edgeHint').textContent=m.hint;
+    $('t-edge').placeholder=m.hint;$('t-edge').value='';
+    ['kickoff','submission','golive','quality','handoff','recap','edge'].forEach(t=>t==='edge'?show('f-'+t):hide('f-'+t));
+    // Re-engage: no next call date; No-show: "Confirmed Next Call"
+    if(edgeId==='reengagement'){hide('sdField');}
+    else{show('sdField');$('sdLabel').innerHTML=(edgeId==='noshow'?'Confirmed Next Call':'Next Call Date')+' <span class="lopt">(optional)</span>';}
+    hide('momentumBlock');
+  }else{
+    ct=type;edgeType=null;
+    const TYPE_LABELS={kickoff:'Post Kickoff',submission:'App Submission',golive:'Go Live',quality:'Post Quality Call',handoff:'Handoff',recap:'Call Recap'};
+    $('detectedBadge').innerHTML='✦ Selected: <b>'+TYPE_LABELS[type]+'</b>';
+    ['kickoff','submission','golive','quality','handoff','recap','edge'].forEach(t=>t===type?show('f-'+t):hide('f-'+t));
+    const DL={kickoff:'Dashboard Training Date',quality:'Hard Launch Date',recap:'Next Call Date'};
+    $('sdLabel').innerHTML=(DL[type]||'Next Call Date')+' <span class="lopt">(optional)</span>';
+    (type==='handoff'||type==='golive'||type==='submission')?hide('sdField'):show('sdField');
+    // Show momentum block for transcript types
+    const needsTranscript=(type==='kickoff'||type==='quality'||type==='recap');
+    needsTranscript?show('momentumBlock'):hide('momentumBlock');
+  }
+  show('S2');$('S2').scrollIntoView({behavior:'smooth'});
+}
 
 // ── MOMENTUM (via server proxy) ───────────────────────────────────────────────
 async function fetchMomentum(){
-  const search = $('momentumSearch').value.trim() || v('mName1');
+  const search = $('momentumSearch').value.trim() || v('mName');
   if(!search){$('momentumStatus').textContent='Enter a merchant name or search term.';$('momentumStatus').style.color='var(--red)';$('momentumStatus').classList.add('show');return;}
   $('momentumBtn').textContent='Fetching...';$('momentumBtn').disabled=true;$('momentumStatus').classList.remove('show');
   try{
@@ -307,7 +411,6 @@ async function fetchMomentum(){
     if(!res.ok){const e=await res.json();throw new Error(e.error||'Momentum error '+res.status);}
     const data=await res.json();
     const meetings=data.meetings||[];
-    // Debug: log all meeting titles to help troubleshoot
     console.log('Momentum meetings:', meetings.map(m=>({title:m.title, attendees:m.attendees?.map(a=>({name:a.name,email:a.email,company:a.company}))  })));
     const match=meetings.find(m=>{
       const t=m.title?.toLowerCase()||'';
@@ -315,12 +418,14 @@ async function fetchMomentum(){
       const atts=m.attendees||[];
       return t.includes(ml)||acc.includes(ml)||atts.some(a=>(a.name||'').toLowerCase().includes(ml)||(a.email||'').toLowerCase().includes(ml)||(a.company||'').toLowerCase().includes(ml));
     });
-    if(!match){$('momentumStatus').innerHTML=`No meetings matching "<b>${search}</b>" in last 90 days. ${meetings.length} meetings searched. <br><span style="font-size:11px;color:var(--text3)">Open browser console (F12) to see all meeting titles returned.</span>`;$('momentumStatus').style.color='var(--text2)';$('momentumStatus').classList.add('show');return;}
+    if(!match){$('momentumStatus').innerHTML=`No meetings matching "<b>${search}</b>" in last 14 days. ${meetings.length} meetings searched.`;$('momentumStatus').style.color='var(--text2)';$('momentumStatus').classList.add('show');return;}
     let transcript='';
     if(match.transcript?.entries?.length){transcript=match.transcript.entries.map(e=>`${e.speaker?.name||'Speaker'}: ${e.text}`).join('\n');}
     if(transcript){
-      $('t-landing').value=transcript;
-      if(!v('mName1')&&match.attendees){const ext=match.attendees.find(a=>!a.isInternal);if(ext)$('mName1').value=ext.company||ext.name?.split(' ').slice(-1)[0]||'';}
+      // Put transcript into the correct textarea
+      const tt={kickoff:'t-kickoff',quality:'t-quality',recap:'t-recap'};
+      if(tt[ct])$(tt[ct]).value=transcript;
+      if(!v('mName')&&match.attendees){const ext=match.attendees.find(a=>!a.isInternal);if(ext)$('mName').value=ext.company||ext.name?.split(' ').slice(-1)[0]||'';}
       const d=match.startTime?new Date(match.startTime).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'';
       $('momentumStatus').innerHTML=`✓ Loaded "<b>${match.title||'Meeting'}</b>"${d?' · '+d:''}`;
       $('momentumStatus').style.color='var(--green)';
@@ -330,56 +435,36 @@ async function fetchMomentum(){
   $('momentumBtn').textContent='⚡ Fetch';$('momentumBtn').disabled=false;
 }
 
-// ── ANALYZE ───────────────────────────────────────────────────────────────────
-async function analyzeTranscript(){
-  transcriptText=v('t-landing');
-  if(!transcriptText){$('landingErr').textContent='Paste a transcript or fetch one from Momentum first.';show('landingErr');return;}
-  hide('landingErr');
-  const btn=$('analyzeBtn');btn.textContent='✦ Continuing...';btn.disabled=true;
-
-  // Copy merchant name and transcript, go straight to compose
-  setTimeout(() => {
-    btn.textContent='✦ Continue';btn.disabled=false;
-    ct='kickoff';edgeType=null;goToCompose('kickoff');
-  }, 200);
+// ── TONE & REGEN ─────────────────────────────────────────────────────────────
+function toggleTone(btn,tone){
+  btn.classList.toggle('on');
+  if(btn.classList.contains('on')){selectedTones.push(tone);}
+  else{selectedTones=selectedTones.filter(t=>t!==tone);}
 }
-
-const TYPE_LABELS={kickoff:'Post Kickoff',submission:'App Submission',golive:'Go Live',quality:'Post Quality Call',handoff:'Handoff',recap:'Call Recap'};
-
-function goToCompose(type){
-  hide('S1');
-  $('detectedBadge').innerHTML=`✦ Detected: <b>${TYPE_LABELS[type]||type}</b>`;
-  document.querySelectorAll('.tpill').forEach(p=>p.classList.toggle('on',p.dataset.t===type));
-  ['kickoff','submission','golive','quality','handoff','recap','edge'].forEach(t=>t===type?show('f-'+t):hide('f-'+t));
-  const tt={kickoff:'t-kickoff',quality:'t-quality',recap:'t-recap'};
-  if(tt[type])$(tt[type]).value=transcriptText;
-  if(v('mName1'))$('mName').value=v('mName1');
-  const DL={kickoff:'Dashboard Training Date',submission:'Next Call Date',quality:'Hard Launch Date',recap:'Next Call Date'};
-  $('sdLabel').innerHTML=(DL[type]||'Next Call Date')+' <span class="lopt">(optional)</span>';
-  (type==='handoff'||type==='golive'||type==='submission')?hide('sdField'):show('sdField');
-  show('S2');$('S2').scrollIntoView({behavior:'smooth'});
-}
-
-function selType(btn){
-  document.querySelectorAll('.tpill').forEach(p=>p.classList.remove('on'));btn.classList.add('on');
-  ct=btn.dataset.t;edgeType=null;
-  ['kickoff','submission','golive','quality','handoff','recap','edge'].forEach(t=>t===ct?show('f-'+t):hide('f-'+t));
-  const DL={kickoff:'Dashboard Training Date',submission:'Next Call Date',quality:'Hard Launch Date',recap:'Next Call Date'};
-  $('sdLabel').innerHTML=(DL[ct]||'Next Call Date')+' <span class="lopt">(optional)</span>';
-  (ct==='handoff'||ct==='golive'||ct==='submission')?hide('sdField'):show('sdField');
-  $('detectedBadge').innerHTML=`✦ Selected: <b>${TYPE_LABELS[ct]||ct}</b>`;
-  const tt={kickoff:'t-kickoff',quality:'t-quality',recap:'t-recap'};
-  if(tt[ct]&&!v(tt[ct])&&transcriptText)$(tt[ct]).value=transcriptText;
-}
-
-const EDGE_META={noshow:{label:'No-show Follow-up',hint:'When was the meeting? How many times rescheduled?'},stalled:{label:'Stalled Merchant',hint:'Where are they stuck? Last touchpoint?'},escalation:{label:'Escalation',hint:'What went wrong? What does the merchant need?'},delay:{label:'Launch Delay',hint:'What is causing the delay? New timeline?'},reengagement:{label:'Re-engagement',hint:'How long unresponsive? Last known status?'},feedback:{label:'Positive Feedback',hint:'What did they say? Any specific praise?'}};
-
-function loadEdge(type){
-  edgeType=type;ct='edge';
-  document.querySelectorAll('.tpill').forEach(p=>p.classList.remove('on'));
-  ['kickoff','submission','golive','quality','handoff','recap','edge'].forEach(t=>t==='edge'?show('f-'+t):hide('f-'+t));
-  show('sdField');$('sdLabel').innerHTML='Next Call Date <span class="lopt">(optional)</span>';
-  const m=EDGE_META[type];$('edgeHint').textContent=m.hint;$('detectedBadge').innerHTML=`✦ Template: <b>${m.label}</b>`;$('t-edge').placeholder=m.hint;$('t-edge').value='';
+function showFeedbackBox(){hide('regenBasic');show('regenFeedback');}
+async function regen(){
+  const feedback=v('regenNotes');
+  const toneStr=selectedTones.length?'Tone adjustments: '+selectedTones.join(', ')+'.':'';
+  const extra=(toneStr||feedback)?'\n\nREGENERATE REQUEST:\n'+(toneStr?toneStr+'\n':'')+(feedback?'User feedback: '+feedback:''):'';
+  hide('OV');$('LT').textContent='Regenerating...';$('LS').textContent='Applying feedback';show('LV');
+  try{
+    const sys=getSys(ct)+extra;
+    const res=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:8192,stream:true,system:sys,messages:[{role:'user',content:buildMsg()}]})});
+    if(!res.ok){const err=await res.json();throw new Error(err.error?.message||res.statusText);}
+    hide('LV');$('OM').textContent=v('mName');$('OT').textContent=TL[ct]||'';hide('IB');$('OS').textContent='';
+    $('EB').innerHTML='<span style="color:#bbb">Writing...</span>';$('CB').textContent='📋 Copy';$('CB').classList.remove('btn-ok');show('OV');
+    // Reset regen UI
+    hide('regenFeedback');show('regenBasic');$('regenNotes').value='';
+    selectedTones=[];document.querySelectorAll('.tone-pill').forEach(p=>p.classList.remove('on'));
+    const reader=res.body.getReader(),dec=new TextDecoder();let buf='',full='',bodyStarted=false;
+    while(true){const{done,value}=await reader.read();if(done)break;buf+=dec.decode(value,{stream:true});
+    const lines=buf.split('\n');buf=lines.pop();
+    for(const line of lines){if(!line.startsWith('data: '))continue;const chunk=line.slice(6).trim();if(chunk==='[DONE]')continue;
+    try{const ev=JSON.parse(chunk);if(ev.type==='content_block_delta'&&ev.delta?.type==='text_delta'){full+=ev.delta.text;if(!bodyStarted&&full.includes('\n---\n'))bodyStarted=true;if(bodyStarted){const bm=full.slice(full.indexOf('\n---\n')+5);if(bm.trim())$('EB').innerHTML=mdToHtml(bm);}}}catch(e){}}}
+    const sm=full.match(/SUBJECT:\s*(.+)/),im=full.match(/INTEGRATIONS:\s*(.+)/),di=full.indexOf('\n---\n'),bm=di>-1?full.slice(di+5):full;
+    $('OS').textContent=sm?sm[1].trim():'';$('EB').innerHTML=mdToHtml(bm);lastFullOutput=full;
+    if(im&&im[1].trim().toUpperCase()!=='NONE'){const ints=im[1].split(',').map(s=>s.trim()).filter(Boolean);if(ints.length){$('IP').innerHTML=ints.map(n=>`<span class="ipill"><span class="idot"></span>${n}</span>`).join('');show('IB');}}
+  }catch(e){hide('LV');show('OV');$('IE').textContent='Error: '+e.message;show('IE');}
 }
 
 // ── INTEGRATION TEMPLATES ─────────────────────────────────────────────────────
@@ -457,7 +542,7 @@ function mdToHtml(md){
 // ── SYSTEM PROMPTS ────────────────────────────────────────────────────────────
 function getEdgeSys(type){
   const base=`You are a Tapcart Implementation Manager writing a follow-up email to a merchant. First person, warm, genuine, concise. No filler. Never show raw URLs. always use markdown links [text](url).\n\nOutput ONLY in this exact format. No extra text:\nSUBJECT: [subject line]\nINTEGRATIONS: NONE\n---\n[email body in markdown]\n\nMARKDOWN RULES: ## for headers, **bold**, - bullets, [text](url) for links, blank lines between paragraphs.`;
-  const p={noshow:base+`\n\nTASK: Follow-up email after a no-show. Warm and non-judgmental.\nKeep it under 6 sentences total.`,stalled:base+`\n\nTASK: Re-engagement email for a merchant who has gone quiet.\nKeep it concise.`,escalation:base+`\n\nTASK: Escalation or issue acknowledgment. Calm, accountable, solution-focused.`,delay:base+`\n\nTASK: Launch delay email. Transparent, proactive, reassuring.`,reengagement:base+`\n\nTASK: Re-engagement for a merchant who has gone dark. Light, no guilt-trip.`,feedback:base+`\n\nTASK: Response to positive feedback. Warm, genuine.\nSoft ask for [Shopify review](https://apps.shopify.com/tapcart).`};
+  const p={noshow:base+`\n\nTASK: Follow-up email after a no-show. Warm and non-judgmental.\nIMPORTANT: If a next call date/time is provided, reference it as a confirmed call already on the calendar (not a proposal). Example: "We still have our call on [date] at [time] — looking forward to connecting then."\nKeep it under 6 sentences total.`,techescalation:base+`\n\nTASK: Tech escalation or issue acknowledgment. Calm, accountable, solution-focused.`,reengagement:base+`\n\nTASK: Re-engagement for a merchant who has gone dark. Light, no guilt-trip.`,feedback:base+`\n\nTASK: Response to positive feedback. Warm, genuine.\nSoft ask for [Shopify review](https://apps.shopify.com/tapcart).`};
   return p[type]||base;
 }
 
@@ -482,9 +567,11 @@ function getSys(type){
 function fmtDate(dId,tId){
   const dv=v(dId);if(!dv)return '';const d=new Date(dv+'T12:00:00');if(isNaN(d))return dv;
   const dp=d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
-  if(!tId)return dp;const h=v(tId+'_h'),m=v(tId+'_m');if(!h)return dp;
+  if(!tId)return dp;const h=v(tId+'_h'),m=v(tId+'_m'),tz=v(tId+'_tz');if(!h)return dp;
   const hi=parseInt(h,10),mi=m?parseInt(m,10):0,ap=hi>=12?'PM':'AM',h12=hi%12||12;
-  return `${dp} at ${mi===0?h12+' '+ap:h12+':'+String(mi).padStart(2,'0')+' '+ap}`;
+  let result=`${dp} at ${mi===0?h12+' '+ap:h12+':'+String(mi).padStart(2,'0')+' '+ap}`;
+  if(tz)result+=' '+tz;
+  return result;
 }
 
 function buildMsg(){
@@ -509,6 +596,8 @@ function chk(){
   return null;
 }
 
+const EDGE_META={noshow:{label:'No-show Follow-up',hint:'When was the meeting? How many times rescheduled?'},techescalation:{label:'Tech Escalation',hint:'What went wrong? What does the merchant need?'},reengagement:{label:'Re-engagement',hint:'How long unresponsive? Last known status?'},feedback:{label:'Positive Feedback',hint:'What did they say? Any specific praise?'}};
+
 const TL={kickoff:'Post Kickoff Email',submission:'App Submission Email',golive:'Go Live Email',quality:'Post Quality Call Email',handoff:'Handoff Email',recap:'Call Recap Email',edge:'Email'};
 const LM={kickoff:'Analyzing transcript...',submission:'Drafting email...',golive:'Drafting email...',quality:'Drafting email...',handoff:'Drafting email...',recap:'Drafting recap...',edge:'Drafting email...'};
 const LSM={kickoff:'Detecting integrations and next steps',submission:'Building follow-up',golive:'Writing launch email',quality:'Reviewing feedback',handoff:'Wrapping up implementation',recap:'Summarizing call',edge:'Personalizing template'};
@@ -520,14 +609,18 @@ async function gen(){
     const res=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:8192,stream:true,system:getSys(ct),messages:[{role:'user',content:buildMsg()}]})});
     if(!res.ok){const err=await res.json();throw new Error(err.error?.message||res.statusText);}
     hide('LV');$('OM').textContent=v('mName');$('OT').textContent=TL[ct]||'';hide('IB');$('OS').textContent='';
-    $('EB').innerHTML='<span style="color:#bbb">Writing...</span>';$('CB').textContent='📋 Copy';$('CB').classList.remove('btn-ok');show('OV');
+    $('EB').innerHTML='<span style="color:#bbb">Writing...</span>';$('CB').textContent='📋 Copy';$('CB').classList.remove('btn-ok');
+    // Reset regen UI
+    hide('regenFeedback');show('regenBasic');$('regenNotes').value='';
+    selectedTones=[];document.querySelectorAll('.tone-pill').forEach(p=>p.classList.remove('on'));
+    show('OV');
     const reader=res.body.getReader(),dec=new TextDecoder();let buf='',full='',bodyStarted=false;
     while(true){const{done,value}=await reader.read();if(done)break;buf+=dec.decode(value,{stream:true});
     const lines=buf.split('\n');buf=lines.pop();
     for(const line of lines){if(!line.startsWith('data: '))continue;const chunk=line.slice(6).trim();if(chunk==='[DONE]')continue;
     try{const ev=JSON.parse(chunk);if(ev.type==='content_block_delta'&&ev.delta?.type==='text_delta'){full+=ev.delta.text;if(!bodyStarted&&full.includes('\n---\n'))bodyStarted=true;if(bodyStarted){const bm=full.slice(full.indexOf('\n---\n')+5);if(bm.trim())$('EB').innerHTML=mdToHtml(bm);}}}catch(e){}}}
     const sm=full.match(/SUBJECT:\s*(.+)/),im=full.match(/INTEGRATIONS:\s*(.+)/),di=full.indexOf('\n---\n'),bm=di>-1?full.slice(di+5):full;
-    $('OS').textContent=sm?sm[1].trim():'';$('EB').innerHTML=mdToHtml(bm);
+    $('OS').textContent=sm?sm[1].trim():'';$('EB').innerHTML=mdToHtml(bm);lastFullOutput=full;
     if(im&&im[1].trim().toUpperCase()!=='NONE'){const ints=im[1].split(',').map(s=>s.trim()).filter(Boolean);if(ints.length){$('IP').innerHTML=ints.map(n=>`<span class="ipill"><span class="idot"></span>${n}</span>`).join('');show('IB');}}
   }catch(e){hide('LV');hide('OV');show('S2');$('IE').textContent='Error: '+e.message;show('IE');}
 }
