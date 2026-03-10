@@ -13,9 +13,9 @@
   --surface3: #F7F3E8;
   --border: #E8E2CC;
   --border2: #D9D1B8;
-  --accent: #E2B714;
-  --accent-dim: rgba(226,183,20,0.10);
-  --accent-glow: rgba(226,183,20,0.20);
+  --accent: #f2fc54;
+  --accent-dim: rgba(242,252,84,0.15);
+  --accent-glow: rgba(242,252,84,0.25);
   --green: #2D9F5B;
   --green-dim: rgba(45,159,91,0.08);
   --red: #dc2626;
@@ -32,7 +32,7 @@ body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--text);min
 .wrap{width:100%;max-width:760px;position:relative;z-index:1}
 .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;padding:0 2px}
 .header-left{display:flex;align-items:center;gap:14px}
-.logo{width:42px;height:42px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-weight:500;font-size:12px;color:#fff;letter-spacing:-0.5px;box-shadow:0 2px 12px var(--accent-glow)}
+.logo{width:42px;height:42px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-weight:500;font-size:12px;color:#1C1C14;letter-spacing:-0.5px;box-shadow:0 2px 12px var(--accent-glow)}
 .header-title{font-size:18px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
 .header-sub{font-size:12px;color:var(--text3);margin-top:2px;font-weight:400}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:28px 30px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
@@ -52,15 +52,15 @@ input::placeholder,textarea::placeholder{color:var(--text3)}
 .type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:24px}
 .tpill{padding:10px 8px;border:1px solid var(--border);border-radius:var(--r-sm);font-size:12px;font-weight:600;cursor:pointer;background:var(--surface);color:var(--text2);font-family:'DM Sans',sans-serif;transition:all .15s;text-align:center;white-space:nowrap}
 .tpill:hover{border-color:var(--border2);color:var(--text);background:var(--surface2)}
-.tpill.on{background:var(--accent-dim);color:var(--accent);border-color:var(--accent);box-shadow:0 0 0 3px rgba(226,183,20,0.12)}
+.tpill.on{background:var(--accent-dim);color:#1C1C14;border-color:var(--accent);box-shadow:0 0 0 3px rgba(242,252,84,0.18)}
 .edge-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
 .epill{padding:5px 12px;border:1px solid var(--border);border-radius:20px;font-size:11px;font-weight:500;cursor:pointer;background:transparent;color:var(--text3);font-family:'DM Sans',sans-serif;transition:all .15s}
-.epill:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
-.btn{padding:10px 20px;background:var(--accent);color:#fff;border:none;border-radius:var(--r-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
-.btn:hover{background:#C9A00F;box-shadow:0 4px 16px var(--accent-glow)}
+.epill:hover{border-color:var(--accent);color:#1C1C14;background:var(--accent-dim)}
+.btn{padding:10px 20px;background:var(--accent);color:#1C1C14;border:none;border-radius:var(--r-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:#d9e34a;box-shadow:0 4px 16px var(--accent-glow)}
 .btn:disabled{opacity:0.5;cursor:not-allowed}
 .btn-ghost{padding:9px 16px;background:transparent;border:1px solid var(--border2);color:var(--text2);border-radius:var(--r-sm);font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
-.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+.btn-ghost:hover{border-color:var(--accent);color:#1C1C14}
 .btn-sm{padding:7px 14px;font-size:12px}
 .btn-full{width:100%;padding:14px;font-size:14px;font-weight:700;border-radius:var(--r-sm);justify-content:center;margin-top:6px}
 .btn-ok{background:var(--green-dim)!important;color:var(--green)!important;border:1px solid rgba(22,163,74,0.25)!important}
@@ -256,7 +256,7 @@ input::placeholder,textarea::placeholder{color:var(--text3)}
     <div class="field"><label>Pending Items / Notes <span class="lopt">(optional)</span></label><textarea id="subNotes" rows="4" placeholder="e.g. Waiting on Firebase credentials..."></textarea></div>
   </div>
   <div id="f-golive" data-h>
-    <div class="field"><label>Tapcart Plan</label><select id="glType"><option value="enterprise">Enterprise</option><option value="selfservice">Self Service</option></select></div>
+    <div class="field"><label>Tapcart Plan</label><select id="glType" onchange="v('glType')==='enterprise'?show('glEntFields'):hide('glEntFields')"><option value="enterprise">Enterprise</option><option value="selfservice">Self Service</option></select></div>
     <div class="g2">
       <div class="field"><label>iOS Download Link <span class="lopt">(optional)</span></label><input id="glIos" placeholder="https://apps.apple.com/..."/></div>
       <div class="field"><label>Android Download Link <span class="lopt">(optional)</span></label><input id="glAnd" placeholder="https://play.google.com/..."/></div>
@@ -271,6 +271,9 @@ input::placeholder,textarea::placeholder{color:var(--text3)}
       </div>
     </div>
     <div class="field"><label>Notes <span class="lopt">(optional)</span></label><textarea id="glNotes" rows="3"></textarea></div>
+    <div id="glEntFields" data-h>
+      <div class="field"><label>Available Quality Call Times <span class="lopt">(enterprise, optional)</span></label><textarea id="glTimes" rows="3" placeholder="e.g. Monday 3/17 at 10 AM PT, Tuesday 3/18 at 2 PM PT..."></textarea></div>
+    </div>
   </div>
   <div id="f-handoff" data-h>
     <div class="field"><label>Account Manager Name *</label><input id="hoAM" placeholder="e.g. Sarah Johnson"/></div>
@@ -554,7 +557,7 @@ function getSys(type){
 
   if(type==='submission')return base+`\n\nTASK: App submission follow-up.\nConfirm the app has been submitted and is currently unpublished — it won't go live until they give the green light.\nInclude test links if provided and explain what they are (beta/APK for testing).\nAfter links: "Please take some time to test the app and send over any feedback. Before launch, we'll run one final build to incorporate any updates from testing and make sure everything is finalized for release."\nIf there are pending items, add a ## Pending Items section and be clear about what's needed and from whom.\nClose warmly — express excitement about getting closer to launch.`;
 
-  if(type==='golive')return base+`\n\nTASK: Go live email.\n\nMAGIC LINK: If a magic link is provided, ALWAYS include it and explain: "This is a direct link you can share with customers — when tapped on mobile, it opens your app automatically (or redirects to the App Store/Google Play if they haven't downloaded it yet)."\n\nENTERPRISE VERSION:\n"Congratulations! Your app is now live! 🎉"\n\n## 📲 Download Your App\n- iOS link if provided\n- Android link if provided\n- Magic link with explanation if provided\n\n## ✅ Next Steps\nStep 1: Review the [Quality Checklist](https://drive.google.com/file/d/1TiSNqbKQlVGHwIhbI9AZf-LVbWxEECRO/view?usp=sharing) — go through this to make sure everything looks great before promoting\nStep 2: Quality Call — use the date if provided, or ask them to book one\nStep 3: Early Ratings — encourage early downloads and ratings to build momentum\n\n## 📚 Bonus Resources\n[Tapcart Academy](https://academy.tapcart.com) · [UnTapped](https://www.tapcart.com/untapped)\n\nSELF SERVICE VERSION:\n"Congratulations! Your app is now live! 🎉"\n\n## 📲 Download Your App\n- iOS link if provided\n- Android link if provided\n- Magic link with explanation if provided\n\n## ✅ What to Do Next\n- Review the [QA Checklist](https://drive.google.com/file/d/12aQKlMoQTOJ4IxQ5NjWqz_nuzJiflkud/view?usp=sharing) to make sure your app looks and feels right before promoting\n- Check out the [Growth Deck](https://drive.google.com/file/d/1wUrDI_DpsqqZ5JLwvDUsxIcJJWtn1xLv/view?usp=sharing) for launch marketing tips and best practices\n- Get help anytime from your [Tapcart Dashboard](https://app.tapcart.com/page/home) — click the help icon in the bottom right\n- Level up with [Tapcart Academy](https://academy.tapcart.com) for tutorials, guides, and strategies\n\nIf you have a moment, we would love a [Shopify review](https://apps.shopify.com/tapcart) ⭐\n\nIMPORTANT: Use the correct version based on the plan type (Enterprise or Self Service). Both should feel celebratory, thorough, and helpful — not rushed.`;
+  if(type==='golive')return base+`\n\nTASK: Go live email. Use the correct version based on plan type.\n\nENTERPRISE VERSION — follow this structure closely:\n\nOpening: "Congratulations! Your app is now live in both the Google Play and Apple App Store! 🎉"\nThen: "Once the links fully propagate, you'll see the app listings load with the download buttons visible."\n\n## 📲 Download Your Apps\n- iOS: [link if provided]\n- Android: [link if provided]\n\nThen if magic link is provided:\n"Prefer one link for everything?"\n"Use your Magic Link: [magic link]"\n"This smart link automatically routes users to the correct app store based on their device."\n\n## ✅ Next Steps\n\n**Step 1: Test Your App**\nUse our attached [Quality Checklist](https://drive.google.com/file/d/1TiSNqbKQlVGHwIhbI9AZf-LVbWxEECRO/view?usp=sharing) to walk through your app and make note of anything you'd like to adjust.\n\n**Step 2: Book Your Quality Call**\nWe'll go over any feedback or questions to make sure the app's ready before you launch it to customers.\nIf a quality call date is provided, use it. If available times are provided, list them. Otherwise ask them to book.\n\n**Step 3: Complete Your Marketing Checklist**\nThis helps us prep for a strong Hard Launch. Please complete it before your Quality Call. Access the checklist [here](https://docs.google.com/spreadsheets/d/1PFBBaQOv-6KOxDQpMTfSVDqYmnmYBfan3bDCfEVF6fk/edit).\n\n**Step 4: Get Early Ratings + Downloads**\nEncourage your team, friends, and family to download and rate the app — this helps increase early traction and visibility.\n\n## 📚 Bonus Resources\n- Explore Hard Launch best practices in [Tapcart Academy](https://academy.tapcart.com)\n- Join our community, [UnTapped](https://www.tapcart.com/untapped), to connect with DTC leaders and find daily inspiration on how to grow and retain your customer base\n\nSELF SERVICE VERSION — follow this structure closely:\n\nOpening: "Congratulations! Your apps are now live and ready for download in both the Google and Apple app stores!"\n\nDownload your apps here:\n- iOS: [link if provided]\n- Android: [link if provided]\n\nIf magic link provided:\n"Prefer one link for everything?"\n"Use your Magic Link: [magic link]"\n"This smart link automatically routes users to the correct app store based on their device."\n\n## 📱 Next Steps\n\n**1. QA your App**\nWe've attached our [Quality Assurance checklist](https://drive.google.com/file/d/12aQKlMoQTOJ4IxQ5NjWqz_nuzJiflkud/view?usp=sharing) to help ensure your app is fully functional before you begin marketing it. This step is key to confirming a seamless customer experience.\n\n**2. Grow your App**\nOnce you've validated functionality, it's time to drive adoption! Attached is our [Growth Strategy Deck](https://drive.google.com/file/d/1wUrDI_DpsqqZ5JLwvDUsxIcJJWtn1xLv/view?usp=sharing), packed with marketing tactics to build excitement and boost downloads.\n\n**3. Get Support**\nNeed help? Just open the "Get Help" chat icon in your [Tapcart dashboard](https://app.tapcart.com/page/home). You'll be able to:\n- General Support Request — For any platform-related questions\n- Request an App Update — Make changes to your app store listing (icon, description, etc.)\n- Report a Bug — Let us know if something isn't working\n- View Product News — See what's new on the Tapcart platform\nOur team monitors these requests closely and is always happy to assist. If needed, we're available to hop on a call.\n\n**4. Learn and Grow**\nTap into our [Tapcart Academy](https://academy.tapcart.com) — your go-to hub for tutorials, strategy tips, and best practices to help your app succeed.\n\nClosing: "If you've enjoyed your experience with us, we'd love for you to leave a [review on Shopify](https://apps.shopify.com/tapcart)!"\n"We're excited to see your app thrive"\n\nIMPORTANT: Follow the structure above closely for whichever plan type is selected. Both versions should feel celebratory, thorough, and helpful.`;
 
   if(type==='quality')return base+`\n\nTASK: Post-quality call email.\n## Hard Launch\n- **Target Date:** [from transcript or TBD]\n- **Blockers:** [if any]\n## Next Steps\n**[Company]:** / **Tapcart:**\nBold the hard launch date in closing.`;
 
@@ -579,7 +582,7 @@ function buildMsg(){
   let msg=`Merchant: ${m}`;if(fn)msg+=`\nFirst Name: ${fn}`;if(d)msg+=`\nNext Call Date: ${d}`;
   if(ct==='kickoff')msg+=`\n\nTRANSCRIPT:\n${v('t-kickoff')}`;
   if(ct==='submission'){msg+=`\nPlatform: ${v('subPlat')}`;if(v('subBeta'))msg+=`\niOS Public Beta: ${v('subBeta')}`;if(v('subApk'))msg+=`\nAndroid APK: ${v('subApk')}`;if(v('subNotes'))msg+=`\n\nPending Items:\n${v('subNotes')}`;}
-  if(ct==='golive'){msg+=`\nPlan: ${v('glType')==='selfservice'?'Self Service':'Enterprise'}`;if(v('glIos'))msg+=`\niOS: ${v('glIos')}`;if(v('glAnd'))msg+=`\nAndroid: ${v('glAnd')}`;if(v('glMagic'))msg+=`\nMagic Link: ${v('glMagic')}`;const qd=fmtDate('glQDate','glQTime');if(qd)msg+=`\nQuality Call: ${qd}`;if(v('glNotes'))msg+=`\nNotes: ${v('glNotes')}`;}
+  if(ct==='golive'){msg+=`\nPlan: ${v('glType')==='selfservice'?'Self Service':'Enterprise'}`;if(v('glIos'))msg+=`\niOS: ${v('glIos')}`;if(v('glAnd'))msg+=`\nAndroid: ${v('glAnd')}`;if(v('glMagic'))msg+=`\nMagic Link: ${v('glMagic')}`;const qd=fmtDate('glQDate','glQTime');if(qd)msg+=`\nQuality Call: ${qd}`;if(v('glTimes'))msg+=`\nAvailable Quality Call Times:\n${v('glTimes')}`;if(v('glNotes'))msg+=`\nNotes: ${v('glNotes')}`;}
   if(ct==='quality')msg+=`\n\nTRANSCRIPT:\n${v('t-quality')}`;
   if(ct==='handoff'){if(v('hoAM'))msg+=`\nAM: ${v('hoAM')}`;const hd=fmtDate('hoDate',null);if(hd)msg+=`\nLaunch: ${hd}`;if(v('hoItems'))msg+=`\n\nOutstanding:\n${v('hoItems')}`;}
   if(ct==='recap'){msg+=`\nCall Type: ${v('rcType')}`;if(v('rcRecording'))msg+=`\nRecording: ${v('rcRecording')}`;msg+=`\n\nNOTES:\n${v('t-recap')}`;}
