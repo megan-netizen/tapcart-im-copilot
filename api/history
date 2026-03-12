@@ -1,0 +1,59 @@
+import { kv } from '@vercel/kv';
+
+// Normalize merchant name for consistent key lookup
+function normalizeKey(name) {
+  return 'merchant:' + name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+}
+
+export default async function handler(req, res) {
+  // GET — fetch history for a merchant
+  if (req.method === 'GET') {
+    const { merchant } = req.query;
+    if (!merchant) return res.status(400).json({ error: 'merchant param required' });
+
+    try {
+      const key = normalizeKey(merchant);
+      const history = await kv.get(key);
+      return res.status(200).json({ merchant, history: history || [] });
+    } catch (e) {
+      console.error('KV GET error:', e);
+      return res.status(500).json({ error: e.message });
+    }
+  }
+
+  // POST — save a new email to merchant history
+  if (req.method === 'POST') {
+    const { merchant, entry } = req.body;
+    if (!merchant || !entry) return res.status(400).json({ error: 'merchant and entry required' });
+
+    try {
+      const key = normalizeKey(merchant);
+      const existing = (await kv.get(key)) || [];
+
+      // Add new entry to front, keep last 50
+      const updated = [entry, ...existing].slice(0, 50);
+      await kv.set(key, updated);
+
+      return res.status(200).json({ ok: true, count: updated.length });
+    } catch (e) {
+      console.error('KV POST error:', e);
+      return res.status(500).json({ error: e.message });
+    }
+  }
+
+  // DELETE — clear history for a merchant (admin use)
+  if (req.method === 'DELETE') {
+    const { merchant } = req.query;
+    if (!merchant) return res.status(400).json({ error: 'merchant param required' });
+
+    try {
+      const key = normalizeKey(merchant);
+      await kv.del(key);
+      return res.status(200).json({ ok: true });
+    } catch (e) {
+      return res.status(500).json({ error: e.message });
+    }
+  }
+
+  return res.status(405).json({ error: 'Method not allowed' });
+}
