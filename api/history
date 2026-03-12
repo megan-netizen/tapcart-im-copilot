@@ -1,4 +1,14 @@
-import { kv } from '@vercel/kv';
+import Redis from 'ioredis';
+
+let client;
+function getClient() {
+  if (client) return client;
+  if (!process.env.KV_REDIS_URL) {
+    throw new Error('KV_REDIS_URL is not configured in environment variables.');
+  }
+  client = new Redis(process.env.KV_REDIS_URL, { tls: { rejectUnauthorized: false } });
+  return client;
+}
 
 // Normalize merchant name for consistent key lookup
 function normalizeKey(name) {
@@ -12,11 +22,13 @@ export default async function handler(req, res) {
     if (!merchant) return res.status(400).json({ error: 'merchant param required' });
 
     try {
+      const redis = getClient();
       const key = normalizeKey(merchant);
-      const history = await kv.get(key);
-      return res.status(200).json({ merchant, history: history || [] });
+      const raw = await redis.get(key);
+      const history = raw ? JSON.parse(raw) : [];
+      return res.status(200).json({ merchant, history });
     } catch (e) {
-      console.error('KV GET error:', e);
+      console.error('KV GET error:', e.message);
       return res.status(500).json({ error: e.message });
     }
   }
@@ -27,28 +39,31 @@ export default async function handler(req, res) {
     if (!merchant || !entry) return res.status(400).json({ error: 'merchant and entry required' });
 
     try {
+      const redis = getClient();
       const key = normalizeKey(merchant);
-      const existing = (await kv.get(key)) || [];
+      const raw = await redis.get(key);
+      const existing = raw ? JSON.parse(raw) : [];
 
       // Add new entry to front, keep last 50
       const updated = [entry, ...existing].slice(0, 50);
-      await kv.set(key, updated);
+      await redis.set(key, JSON.stringify(updated));
 
       return res.status(200).json({ ok: true, count: updated.length });
     } catch (e) {
-      console.error('KV POST error:', e);
+      console.error('Redis POST error:', e.message);
       return res.status(500).json({ error: e.message });
     }
   }
 
-  // DELETE — clear history for a merchant (admin use)
+  // DELETE — clear history for a merchant
   if (req.method === 'DELETE') {
     const { merchant } = req.query;
     if (!merchant) return res.status(400).json({ error: 'merchant param required' });
 
     try {
+      const redis = getClient();
       const key = normalizeKey(merchant);
-      await kv.del(key);
+      await redis.del(key);
       return res.status(200).json({ ok: true });
     } catch (e) {
       return res.status(500).json({ error: e.message });
