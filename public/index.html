@@ -119,6 +119,20 @@ input::placeholder,textarea::placeholder{color:var(--text3)}
 .tone-pill{padding:5px 14px;border:1px solid var(--border);border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;background:transparent;color:var(--text3);font-family:'DM Sans',sans-serif;transition:all .15s}
 .tone-pill:hover{border-color:var(--green);color:var(--green)}
 .tone-pill.on{background:var(--green-dim);color:var(--green);border-color:var(--green);font-weight:600}
+.history-panel{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:18px;overflow:hidden}
+.history-toggle{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;font-size:12px;font-weight:600;color:var(--text2);transition:background .15s}
+.history-toggle:hover{background:var(--surface3)}
+.history-toggle .hcount{background:var(--accent-dim);color:var(--text);padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700}
+.history-body{padding:0 16px 14px;max-height:300px;overflow-y:auto}
+.history-entry{padding:10px 12px;border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:8px;background:var(--surface);cursor:pointer;transition:all .15s}
+.history-entry:hover{border-color:var(--border2);box-shadow:0 1px 4px rgba(0,0,0,0.04)}
+.history-entry .he-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.history-entry .he-type{font-size:11px;font-weight:600;color:var(--text)}
+.history-entry .he-date{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace}
+.history-entry .he-subj{font-size:11px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.history-entry .he-ints{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+.history-entry .he-int{font-size:9px;padding:2px 7px;background:var(--green-dim);color:var(--green);border-radius:10px;font-weight:500}
+.history-loading{font-size:12px;color:var(--text3);padding:8px 0;text-align:center}
 </style>
 </head>
 <body>
@@ -197,6 +211,10 @@ input::placeholder,textarea::placeholder{color:var(--text3)}
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px"><span style="font-size:20px">🤝</span><span style="font-size:14px;font-weight:700">Handoff</span></div>
         <div style="font-size:11.5px;color:var(--text3);padding-left:30px">Transition to AM with outstanding items</div>
       </div>
+      <div class="tmpl-card" onclick="pickTemplate('followup')">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px"><span style="font-size:20px">🔁</span><span style="font-size:14px;font-weight:700">Follow Up</span></div>
+        <div style="font-size:11.5px;color:var(--text3);padding-left:30px">Check in on outstanding action items from previous emails</div>
+      </div>
     </div>
 
     <div class="section-label">Edge Cases</div>
@@ -219,8 +237,19 @@ input::placeholder,textarea::placeholder{color:var(--text3)}
   <hr class="hr"/>
 
   <div class="g2">
-    <div class="field"><label>Merchant Name *</label><input id="mName" placeholder="e.g. Longevity Rx"/></div>
+    <div class="field"><label>Merchant Name *</label><input id="mName" placeholder="e.g. Longevity Rx" onblur="loadHistory()"/></div>
     <div class="field"><label>First Name <span class="lopt">(greeting)</span></label><input id="fName" placeholder="e.g. Emily"/></div>
+  </div>
+
+  <!-- Merchant History -->
+  <div id="historyPanel" data-h class="history-panel">
+    <div class="history-toggle" onclick="toggleHistory()">
+      <span>📂 Merchant History <span class="hcount" id="historyCount">0</span></span>
+      <span id="historyArrow" style="font-size:10px;transition:transform .2s">▼</span>
+    </div>
+    <div id="historyBody" class="history-body" data-h>
+      <div id="historyList"></div>
+    </div>
   </div>
 
   <!-- Momentum block for transcript types -->
@@ -290,6 +319,20 @@ input::placeholder,textarea::placeholder{color:var(--text3)}
   </div>
   <div id="f-edge" data-h>
     <div class="field"><label>Context / Notes <span class="lopt">(optional)</span></label><div class="hint" id="edgeHint"></div><textarea id="t-edge" rows="6"></textarea></div>
+  </div>
+  <div id="f-followup" data-h>
+    <div id="fuHistoryWarn" class="err" data-h>No merchant history found. The Follow Up template works best when there are previous emails on file for this merchant. Enter the merchant name above first, or use a different template.</div>
+    <div class="field"><label>What to follow up on <span class="lopt">(optional — AI will pull from history if blank)</span></label>
+      <div class="hint">Leave blank to auto-generate from previous email action items, or add specific items you want to check in on.</div>
+      <textarea id="fuNotes" rows="4" placeholder="e.g. Klaviyo invite still pending, need Firebase API key, dev account enrollment status..."></textarea>
+    </div>
+    <div class="field"><label>Tone / Urgency</label>
+      <select id="fuTone">
+        <option value="friendly">Friendly check-in</option>
+        <option value="nudge">Gentle nudge</option>
+        <option value="urgent">Time-sensitive / urgent</option>
+      </select>
+    </div>
   </div>
 
   <div id="IE" class="err" data-h></div>
@@ -381,22 +424,28 @@ function pickTemplate(type, edgeId){
     $('detectedBadge').innerHTML='✦ Template: <b>'+m.label+'</b>';
     $('edgeHint').textContent=m.hint;
     $('t-edge').placeholder=m.hint;$('t-edge').value='';
-    ['kickoff','submission','golive','quality','handoff','recap','edge'].forEach(t=>t==='edge'?show('f-'+t):hide('f-'+t));
+    ['kickoff','submission','golive','quality','handoff','recap','edge','followup'].forEach(t=>t==='edge'?show('f-'+t):hide('f-'+t));
     // Re-engage: no next call date; No-show: "Confirmed Next Call"
     if(edgeId==='reengagement'){hide('sdField');}
     else{show('sdField');$('sdLabel').innerHTML=(edgeId==='noshow'?'Confirmed Next Call':'Next Call Date')+' <span class="lopt">(optional)</span>';}
     hide('momentumBlock');
   }else{
     ct=type;edgeType=null;
-    const TYPE_LABELS={kickoff:'Post Kickoff',submission:'App Submission',golive:'Go Live',quality:'Post Quality Call',handoff:'Handoff',recap:'Call Recap'};
+    const TYPE_LABELS={kickoff:'Post Kickoff',submission:'App Submission',golive:'Go Live',quality:'Post Quality Call',handoff:'Handoff',recap:'Call Recap',followup:'Follow Up'};
     $('detectedBadge').innerHTML='✦ Selected: <b>'+TYPE_LABELS[type]+'</b>';
-    ['kickoff','submission','golive','quality','handoff','recap','edge'].forEach(t=>t===type?show('f-'+t):hide('f-'+t));
+    ['kickoff','submission','golive','quality','handoff','recap','edge','followup'].forEach(t=>t===type?show('f-'+t):hide('f-'+t));
     const DL={kickoff:'Dashboard Training Date',quality:'Hard Launch Date',recap:'Next Call Date'};
     $('sdLabel').innerHTML=(DL[type]||'Next Call Date')+' <span class="lopt">(optional)</span>';
-    (type==='handoff'||type==='golive'||type==='submission')?hide('sdField'):show('sdField');
+    (type==='handoff'||type==='golive'||type==='submission'||type==='followup')?hide('sdField'):show('sdField');
     // Show momentum block for transcript types
     const needsTranscript=(type==='kickoff'||type==='quality'||type==='recap');
     needsTranscript?show('momentumBlock'):hide('momentumBlock');
+    // Follow-up: warn if no history, auto-load history
+    if(type==='followup'){
+      if(!merchantHistory.length&&v('mName')){loadHistory().then(()=>{if(!merchantHistory.length)show('fuHistoryWarn');else hide('fuHistoryWarn');});}
+      else if(!merchantHistory.length){show('fuHistoryWarn');}
+      else{hide('fuHistoryWarn');}
+    }
   }
   show('S2');$('S2').scrollIntoView({behavior:'smooth'});
 }
@@ -451,7 +500,7 @@ async function regen(){
   const extra=(toneStr||feedback)?'\n\nREGENERATE REQUEST:\n'+(toneStr?toneStr+'\n':'')+(feedback?'User feedback: '+feedback:''):'';
   hide('OV');$('LT').textContent='Regenerating...';$('LS').textContent='Applying feedback';show('LV');
   try{
-    const sys=getSys(ct)+extra;
+    const sys=getSys(ct)+getHistoryContext()+extra;
     const res=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:8192,stream:true,system:sys,messages:[{role:'user',content:buildMsg()}]})});
     if(!res.ok){const err=await res.json();throw new Error(err.error?.message||res.statusText);}
     hide('LV');$('OM').textContent=v('mName');$('OT').textContent=TL[ct]||'';hide('IB');$('OS').textContent='';
@@ -467,6 +516,8 @@ async function regen(){
     const sm=full.match(/SUBJECT:\s*(.+)/),im=full.match(/INTEGRATIONS:\s*(.+)/),di=full.indexOf('\n---\n'),bm=di>-1?full.slice(di+5):full;
     $('OS').textContent=sm?sm[1].trim():'';$('EB').innerHTML=mdToHtml(bm);lastFullOutput=full;
     if(im&&im[1].trim().toUpperCase()!=='NONE'){const ints=im[1].split(',').map(s=>s.trim()).filter(Boolean);if(ints.length){$('IP').innerHTML=ints.map(n=>`<span class="ipill"><span class="idot"></span>${n}</span>`).join('');show('IB');}}
+    // Save regenerated version to history
+    saveToHistory(full);
   }catch(e){hide('LV');show('OV');$('IE').textContent='Error: '+e.message;show('IE');}
 }
 
@@ -564,6 +615,8 @@ function getSys(type){
   if(type==='handoff')return base+`\n\nTASK: Handoff email. This is a milestone — be celebratory and warm.\nThank the merchant for the journey and acknowledge the work that went into getting here.\nIf there are outstanding items, list them clearly so nothing falls through the cracks.\n\n## Next Steps\n⭐️ Leave a [Shopify review](https://apps.shopify.com/tapcart) — it helps other merchants discover Tapcart\n📝 Fill out our quick [Survey](https://www.tapcart.com) — your feedback helps us improve\n💰 Refer & Earn — let them know about the referral program\n\nIntroduce the Account Manager [name] as their new main point of contact going forward. Let them know they can always reach support through their [dashboard](https://app.tapcart.com/page/home).\nClose with genuine well-wishes for their app's success.`;
 
   if(type==='recap')return base+`\n\nTASK: Call recap.\nRules: no duplicate items between What We Covered and Action Items. Use company name. Bold next call date. Include recording link if provided.\nDev account logic if discussed (same as kickoff).\nDashboard Training: one bullet about [dashboard](https://app.tapcart.com/page/home) walkthrough + [Design Help](https://help.tapcart.com/en/collections/12574991-designing-your-app).\n## What We Covered\n## Developer Account Setup (if discussed)\n## Action Items\n**[Company]:** / **Tapcart:**`;
+
+  if(type==='followup')return base+`\n\nTASK: Follow-up email to check in on outstanding action items from previous communications.\n\nThis email should be driven by the MERCHANT HISTORY provided in the system context. Review all previous emails sent to this merchant and identify:\n1. Action items that were assigned to the merchant that may still be outstanding (integrations pending, dev account steps, content/assets needed, etc.)\n2. Action items that were assigned to Tapcart that should be updated on\n3. The current stage of implementation (pre-kickoff, post-kickoff, submitted, live, etc.)\n\nSTRUCTURE:\nWarm, friendly opening — reference the last touchpoint naturally (e.g. "Wanted to check in since our call last week" or "Following up on a few items from our last email").\n\n## Outstanding Items\nList each outstanding action item with clear ownership:\n**[Company name]:**\n- Item 1 — brief context of what's needed and why\n- Item 2\n\n**Tapcart:**\n- Any updates on Tapcart-side items\n\nIf specific items were provided by the IM in the "follow up on" field, prioritize those.\nIf no specific items were provided, intelligently extract them from the merchant history.\n\nTONE GUIDANCE:\n- "friendly" = casual check-in, no pressure, just touching base\n- "nudge" = polite but clear that these items are needed to keep things moving\n- "urgent" = time-sensitive, emphasize that these items are blocking progress or launch\n\nClose by making it easy for them to respond — offer to hop on a call if needed, or ask them to reply with updates on the items.\n\nIMPORTANT: This email should feel like it was written by someone who has full context on the account, not a generic follow-up. Reference specific integrations, specific steps, specific dates from previous emails.`;
 }
 
 // ── BUILD & VALIDATE ──────────────────────────────────────────────────────────
@@ -587,6 +640,7 @@ function buildMsg(){
   if(ct==='handoff'){if(v('hoAM'))msg+=`\nAM: ${v('hoAM')}`;const hd=fmtDate('hoDate',null);if(hd)msg+=`\nLaunch: ${hd}`;if(v('hoItems'))msg+=`\n\nOutstanding:\n${v('hoItems')}`;}
   if(ct==='recap'){msg+=`\nCall Type: ${v('rcType')}`;if(v('rcRecording'))msg+=`\nRecording: ${v('rcRecording')}`;msg+=`\n\nNOTES:\n${v('t-recap')}`;}
   if(ct==='edge'){if(edgeType)msg+=`\nTemplate: ${EDGE_META[edgeType]?.label||edgeType}`;if(v('t-edge'))msg+=`\nContext:\n${v('t-edge')}`;}
+  if(ct==='followup'){msg+=`\nTone: ${v('fuTone')}`;if(v('fuNotes'))msg+=`\nSpecific items to follow up on:\n${v('fuNotes')}`;else msg+='\nAuto-generate follow-up items from merchant history.';}
   return msg;
 }
 
@@ -596,20 +650,21 @@ function chk(){
   if(ct==='quality'&&!v('t-quality'))return 'Paste the call transcript or notes.';
   if(ct==='recap'&&!v('t-recap'))return 'Paste the transcript or notes.';
   if(ct==='edge'&&!edgeType)return 'Select an edge case template.';
+  if(ct==='followup'&&!merchantHistory.length&&!v('fuNotes'))return 'No merchant history found and no follow-up items specified. Enter the merchant name to load history, or add specific items to follow up on.';
   return null;
 }
 
 const EDGE_META={noshow:{label:'No-show Follow-up',hint:'When was the meeting? How many times rescheduled?'},techescalation:{label:'Tech Escalation',hint:'What went wrong? What does the merchant need?'},reengagement:{label:'Re-engagement',hint:'How long unresponsive? Last known status?'},feedback:{label:'Positive Feedback',hint:'What did they say? Any specific praise?'}};
 
-const TL={kickoff:'Post Kickoff Email',submission:'App Submission Email',golive:'Go Live Email',quality:'Post Quality Call Email',handoff:'Handoff Email',recap:'Call Recap Email',edge:'Email'};
-const LM={kickoff:'Analyzing transcript...',submission:'Drafting email...',golive:'Drafting email...',quality:'Drafting email...',handoff:'Drafting email...',recap:'Drafting recap...',edge:'Drafting email...'};
-const LSM={kickoff:'Detecting integrations and next steps',submission:'Building follow-up',golive:'Writing launch email',quality:'Reviewing feedback',handoff:'Wrapping up implementation',recap:'Summarizing call',edge:'Personalizing template'};
+const TL={kickoff:'Post Kickoff Email',submission:'App Submission Email',golive:'Go Live Email',quality:'Post Quality Call Email',handoff:'Handoff Email',recap:'Call Recap Email',followup:'Follow Up Email',edge:'Email'};
+const LM={kickoff:'Analyzing transcript...',submission:'Drafting email...',golive:'Drafting email...',quality:'Drafting email...',handoff:'Drafting email...',recap:'Drafting recap...',followup:'Reviewing history & drafting follow-up...',edge:'Drafting email...'};
+const LSM={kickoff:'Detecting integrations and next steps',submission:'Building follow-up',golive:'Writing launch email',quality:'Reviewing feedback',handoff:'Wrapping up implementation',recap:'Summarizing call',followup:'Checking outstanding action items',edge:'Personalizing template'};
 
 async function gen(){
   const e=chk();if(e){$('IE').textContent=e;show('IE');return;}
   hide('IE');hide('S2');$('LT').textContent=LM[ct]||'Generating...';$('LS').textContent=LSM[ct]||'';show('LV');
   try{
-    const res=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:8192,stream:true,system:getSys(ct),messages:[{role:'user',content:buildMsg()}]})});
+    const res=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:8192,stream:true,system:getSys(ct)+getHistoryContext(),messages:[{role:'user',content:buildMsg()}]})});
     if(!res.ok){const err=await res.json();throw new Error(err.error?.message||res.statusText);}
     hide('LV');$('OM').textContent=v('mName');$('OT').textContent=TL[ct]||'';hide('IB');$('OS').textContent='';
     $('EB').innerHTML='<span style="color:#bbb">Writing...</span>';$('CB').textContent='📋 Copy';$('CB').classList.remove('btn-ok');
@@ -625,7 +680,106 @@ async function gen(){
     const sm=full.match(/SUBJECT:\s*(.+)/),im=full.match(/INTEGRATIONS:\s*(.+)/),di=full.indexOf('\n---\n'),bm=di>-1?full.slice(di+5):full;
     $('OS').textContent=sm?sm[1].trim():'';$('EB').innerHTML=mdToHtml(bm);lastFullOutput=full;
     if(im&&im[1].trim().toUpperCase()!=='NONE'){const ints=im[1].split(',').map(s=>s.trim()).filter(Boolean);if(ints.length){$('IP').innerHTML=ints.map(n=>`<span class="ipill"><span class="idot"></span>${n}</span>`).join('');show('IB');}}
+    // Save to merchant history
+    saveToHistory(full);
   }catch(e){hide('LV');hide('OV');show('S2');$('IE').textContent='Error: '+e.message;show('IE');}
+}
+
+// ── MERCHANT HISTORY ──────────────────────────────────────────────────────────
+let merchantHistory=[], historyOpen=false;
+
+async function loadHistory(){
+  const name=v('mName');
+  if(!name){hide('historyPanel');return;}
+  try{
+    const res=await fetch('/api/history?merchant='+encodeURIComponent(name));
+    if(!res.ok)return;
+    const data=await res.json();
+    merchantHistory=data.history||[];
+    if(merchantHistory.length>0){
+      $('historyCount').textContent=merchantHistory.length;
+      renderHistory();
+      show('historyPanel');
+    }else{hide('historyPanel');}
+  }catch(e){console.error('History fetch error:',e);}
+}
+
+function renderHistory(){
+  const list=$('historyList');
+  if(!merchantHistory.length){list.innerHTML='<div class="history-loading">No previous emails</div>';return;}
+  list.innerHTML=merchantHistory.map((e,i)=>{
+    const d=e.date?new Date(e.date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'';
+    const ints=(e.integrations||[]).map(n=>'<span class="he-int">'+n+'</span>').join('');
+    return `<div class="history-entry" onclick="viewHistoryEntry(${i})">
+      <div class="he-top"><span class="he-type">${e.typeLabel||e.type||''}</span><span class="he-date">${d}</span></div>
+      <div class="he-subj">${e.subject||'No subject'}</div>
+      ${ints?'<div class="he-ints">'+ints+'</div>':''}
+    </div>`;
+  }).join('');
+}
+
+function toggleHistory(){
+  historyOpen=!historyOpen;
+  historyOpen?show('historyBody'):hide('historyBody');
+  $('historyArrow').style.transform=historyOpen?'rotate(180deg)':'';
+}
+
+function viewHistoryEntry(i){
+  const e=merchantHistory[i];
+  if(!e||!e.body)return;
+  // Show in a simple alert for now — could be a modal later
+  const d=e.date?new Date(e.date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'';
+  const msg=`${e.typeLabel||e.type} — ${d}\nSubject: ${e.subject||'N/A'}\nIntegrations: ${(e.integrations||[]).join(', ')||'None'}\n\n${e.body.substring(0,500)}${e.body.length>500?'...':''}`;
+  alert(msg);
+}
+
+async function saveToHistory(fullOutput){
+  const name=v('mName');
+  if(!name)return;
+  const sm=fullOutput.match(/SUBJECT:\s*(.+)/);
+  const im=fullOutput.match(/INTEGRATIONS:\s*(.+)/);
+  const di=fullOutput.indexOf('\n---\n');
+  const body=di>-1?fullOutput.slice(di+5):fullOutput;
+  const integrations=(im&&im[1].trim().toUpperCase()!=='NONE')?im[1].split(',').map(s=>s.trim()).filter(Boolean):[];
+  const entry={
+    type:ct,
+    typeLabel:TL[ct]||(edgeType?EDGE_META[edgeType]?.label:'Email'),
+    date:new Date().toISOString(),
+    subject:sm?sm[1].trim():'',
+    integrations:integrations,
+    body:body.substring(0,2000)
+  };
+  try{
+    await fetch('/api/history',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({merchant:name,entry})});
+    // Refresh local history
+    merchantHistory=[entry,...merchantHistory].slice(0,50);
+    $('historyCount').textContent=merchantHistory.length;
+    renderHistory();
+    show('historyPanel');
+  }catch(e){console.error('History save error:',e);}
+}
+
+function getHistoryContext(){
+  if(!merchantHistory.length)return '';
+  const isFollowUp=(ct==='followup');
+  const recent=merchantHistory.slice(0, isFollowUp?10:5);
+  let ctx='\n\nMERCHANT HISTORY (previous emails sent to this merchant, most recent first):\n';
+  recent.forEach(e=>{
+    const d=e.date?new Date(e.date).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'';
+    ctx+=`\n--- ${d}: ${e.typeLabel||e.type} ---\n`;
+    if(e.subject)ctx+=`Subject: ${e.subject}\n`;
+    if(e.integrations&&e.integrations.length)ctx+=`Integrations mentioned: ${e.integrations.join(', ')}\n`;
+    if(isFollowUp&&e.body){
+      // For follow-up emails, include the full email body so AI can extract action items
+      ctx+=`Email body:\n${e.body}\n`;
+    }
+  });
+  if(isFollowUp){
+    ctx+='\nAnalyze the email bodies above carefully. Extract ALL outstanding action items — anything assigned to the merchant or to Tapcart that has not been confirmed as completed in a later email. Pay special attention to integration setup steps, dev account enrollment, content/asset requests, and scheduling items.';
+  }else{
+    ctx+='\nUse this history to provide continuity. Reference completed items, avoid repeating the same instructions for integrations that were already covered, and acknowledge progress since previous emails. If an integration was mentioned in a previous email as pending, and the transcript or context suggests it is now complete, mark it as completed.';
+  }
+  return ctx;
 }
 
 function cp(){const el=$('EB'),r=document.createRange();r.selectNodeContents(el);const s=window.getSelection();s.removeAllRanges();s.addRange(r);document.execCommand('copy');s.removeAllRanges();$('CB').textContent='Copied!';$('CB').classList.add('btn-ok');setTimeout(()=>{$('CB').textContent='📋 Copy';$('CB').classList.remove('btn-ok');},2000);}
