@@ -1,3 +1,5 @@
+import { validateToken } from './auth.js';
+
 import { put, list, del } from '@vercel/blob';
 
 function normalizeKey(name) {
@@ -15,6 +17,7 @@ async function getHistory(key) {
 }
 
 export default async function handler(req, res) {
+  if (!validateToken(req)) return res.status(401).json({ error: 'Unauthorized' });
 
   // GET — fetch history for a merchant
   if (req.method === 'GET') {
@@ -38,7 +41,7 @@ export default async function handler(req, res) {
       const existing = await getHistory(key);
       const updated = [entry, ...existing].slice(0, 50);
       await put(key, JSON.stringify(updated), {
-        access: 'private',
+        access: 'public',
         contentType: 'application/json',
         addRandomSuffix: false,
         cacheControlMaxAge: 0
