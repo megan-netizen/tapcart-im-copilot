@@ -237,7 +237,7 @@ input::placeholder,textarea::placeholder{color:var(--text3)}
   <hr class="hr"/>
 
   <div class="g2">
-    <div class="field"><label>Merchant Name *</label><input id="mName" placeholder="e.g. Longevity Rx" onblur="loadHistory()"/></div>
+    <div class="field"><label>Merchant Name *</label><input id="mName" placeholder="e.g. Longevity Rx" onblur="loadHistory()" oninput="clearHistoryIfChanged()" onkeydown="if(event.key==='Enter'){this.blur();}"/></div>
     <div class="field"><label>First Name <span class="lopt">(greeting)</span></label><input id="fName" placeholder="e.g. Emily"/></div>
   </div>
 
@@ -686,22 +686,42 @@ async function gen(){
 }
 
 // ── MERCHANT HISTORY ──────────────────────────────────────────────────────────
-let merchantHistory=[], historyOpen=false;
+let merchantHistory=[], historyOpen=false, lastLoadedMerchant='';
+
+// Clear stale history immediately when user starts typing a new merchant name
+function clearHistoryIfChanged(){
+  const name=v('mName').trim();
+  if(name.toLowerCase()!==lastLoadedMerchant.toLowerCase()){
+    merchantHistory=[];
+    lastLoadedMerchant='';
+    hide('historyPanel');
+    $('historyCount').textContent='0';
+  }
+}
 
 async function loadHistory(){
-  const name=v('mName');
+  const name=v('mName').trim();
   if(!name){hide('historyPanel');return;}
+  // Don't re-fetch if we already loaded this merchant
+  if(name.toLowerCase()===lastLoadedMerchant.toLowerCase()&&merchantHistory.length>0)return;
   try{
     const res=await fetch('/api/history?merchant='+encodeURIComponent(name));
     if(!res.ok)return;
     const data=await res.json();
     merchantHistory=data.history||[];
+    lastLoadedMerchant=name;
     if(merchantHistory.length>0){
       $('historyCount').textContent=merchantHistory.length;
       renderHistory();
       show('historyPanel');
-    }else{hide('historyPanel');}
-  }catch(e){console.error('History fetch error:',e);}
+      historyOpen=false; // start collapsed
+      hide('historyBody');
+      $('historyArrow').style.transform='';
+    }else{
+      hide('historyPanel');
+      $('historyCount').textContent='0';
+    }
+  }catch(e){console.error('History fetch error:',e);if(e.message)console.warn('History unavailable — is Vercel KV configured?',e.message);}
 }
 
 function renderHistory(){
@@ -750,9 +770,11 @@ async function saveToHistory(fullOutput){
     body:body.substring(0,2000)
   };
   try{
-    await fetch('/api/history',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({merchant:name,entry})});
+    const r=await fetch('/api/history',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({merchant:name,entry})});
+    if(!r.ok){const err=await r.json().catch(()=>({}));console.error('History save failed:',r.status,err.error||'(no KV?)');return;}
     // Refresh local history
     merchantHistory=[entry,...merchantHistory].slice(0,50);
+    lastLoadedMerchant=name;
     $('historyCount').textContent=merchantHistory.length;
     renderHistory();
     show('historyPanel');
