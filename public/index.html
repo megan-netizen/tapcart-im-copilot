@@ -950,6 +950,102 @@ function logout() {
   }
 })();
 
+// ── MERCHANT DATABASE DRAWER ──────────────────────────────────────────────────
+let dbMerchants = [], dbOpen = false;
+
+async function openDB() {
+  $('dbDrawer').style.display = 'flex';
+  $('dbOverlay').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => $('dbDrawer').classList.add('open'), 10);
+  dbOpen = true;
+  await loadDB();
+}
+
+function closeDB() {
+  $('dbDrawer').classList.remove('open');
+  $('dbOverlay').style.display = 'none';
+  document.body.style.overflow = '';
+  setTimeout(() => { $('dbDrawer').style.display = 'none'; }, 260);
+  dbOpen = false;
+}
+
+async function loadDB() {
+  $('dbBody').innerHTML = '<div class="db-loading">Loading merchants...</div>';
+  try {
+    const res = await fetch('/api/history?all=true', { headers: authHeaders() });
+    if (!res.ok) throw new Error('Failed to load');
+    const data = await res.json();
+    dbMerchants = data.merchants || [];
+    $('dbSubtitle').textContent = dbMerchants.length + ' merchant' + (dbMerchants.length !== 1 ? 's' : '');
+    renderDB();
+  } catch(e) {
+    $('dbBody').innerHTML = '<div class="db-empty">Could not load.<br>' + e.message + '</div>';
+  }
+}
+
+function renderDB() {
+  const q = ($('dbSearch').value || '').toLowerCase().trim();
+  const filtered = q ? dbMerchants.filter(m => m.name.toLowerCase().includes(q)) : dbMerchants;
+  if (!filtered.length) {
+    $('dbBody').innerHTML = '<div class="db-empty">No merchants found.</div>';
+    return;
+  }
+  $('dbBody').innerHTML = filtered.map((m, i) => {
+    const last = m.lastEmail;
+    const lastDate = last && last.date ? new Date(last.date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
+    const lastType = (last && (last.typeLabel || last.type)) || '';
+    const emailRows = m.emails.map((e, j) => {
+      const d = e.date ? new Date(e.date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
+      const ints = (e.integrations||[]).map(n => '<span class="db-email-int">'+n+'</span>').join('');
+      return '<div class="db-email" onclick="previewEmail('+i+','+j+')">'
+        +'<div class="db-email-top"><span class="db-email-type">'+(e.typeLabel||e.type||'Email')+'</span><span class="db-email-date">'+d+'</span></div>'
+        +'<div class="db-email-subj">'+(e.subject||'No subject')+'</div>'
+        +(e.im ? '<div class="db-email-im">drafted by '+e.im+'</div>' : '')
+        +(ints ? '<div class="db-email-ints">'+ints+'</div>' : '')
+        +'</div>';
+    }).join('');
+    const safeName = m.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    return '<div class="db-merchant">'
+      +'<div class="db-merchant-head" onclick="toggleMerchant('+i+')">'
+        +'<div><div class="db-merchant-name">'+m.name+'</div>'
+        +'<div class="db-merchant-meta">'+(lastType?'Last: '+lastType:'')+(lastDate?' · '+lastDate:'')+'</div></div>'
+        +'<div class="db-merchant-right">'
+          +'<span class="db-count">'+m.count+' email'+(m.count!==1?'s':'')+'</span>'
+          +'<button class="db-del" onclick="event.stopPropagation();deleteMerchant(''+safeName+'')">Delete</button>'
+        +'</div>'
+      +'</div>'
+      +'<div class="db-emails" id="dbe-'+i+'">'+emailRows+'</div>'
+      +'</div>';
+  }).join('');
+}
+
+function toggleMerchant(i) { $('dbe-'+i).classList.toggle('open'); }
+
+function previewEmail(mi, ei) {
+  const q = ($('dbSearch').value || '').toLowerCase().trim();
+  const filtered = q ? dbMerchants.filter(m => m.name.toLowerCase().includes(q)) : dbMerchants;
+  const m = filtered[mi]; if (!m) return;
+  const e = m.emails[ei]; if (!e) return;
+  const d = e.date ? new Date(e.date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
+  $('dbPrevTitle').textContent = (e.typeLabel||e.type||'Email')+(e.subject?' — '+e.subject:'');
+  $('dbPrevMeta').textContent = m.name+(d?' · '+d:'')+(e.im?' · drafted by '+e.im:'');
+  $('dbPrevBody').textContent = e.body || 'No body saved.';
+  $('dbPreview').style.display = 'flex';
+}
+
+function closePreview() { $('dbPreview').style.display = 'none'; }
+
+async function deleteMerchant(name) {
+  if (!confirm('Delete all history for "'+name+'"? This cannot be undone.')) return;
+  try {
+    const res = await fetch('/api/history?merchant='+encodeURIComponent(name),{method:'DELETE',headers:authHeaders()});
+    if (!res.ok) throw new Error('Delete failed');
+    await loadDB();
+  } catch(e) { alert('Could not delete: '+e.message); }
+}
+
+document.addEventListener('click', e => { if (e.target === $('dbPreview')) closePreview(); });
 </script>
 
 <div id="dbOverlay" onclick="closeDB()"></div>
