@@ -141,6 +141,51 @@ input::placeholder,textarea::placeholder{color:var(--text3)}
 .login-title{font-size:20px;font-weight:700;color:var(--text);letter-spacing:-0.3px;margin-bottom:4px}
 .login-sub{font-size:13px;color:var(--text3);margin-bottom:28px}
 .login-err{color:var(--red);font-size:12px;margin-top:10px;padding:8px 12px;background:var(--red-dim);border:1px solid rgba(220,38,38,0.15);border-radius:var(--r-sm);display:none}
+
+/* ── MERCHANT DB DRAWER ── */
+#dbOverlay{position:fixed;inset:0;background:rgba(0,0,0,0.3);z-index:8000;display:none;backdrop-filter:blur(2px)}
+#dbDrawer{position:fixed;top:0;right:0;height:100vh;width:min(560px,100vw);background:var(--bg);z-index:8001;display:none;flex-direction:column;box-shadow:-4px 0 32px rgba(0,0,0,0.12);transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1)}
+#dbDrawer.open{transform:none}
+.db-head{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.db-title{font-size:16px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
+.db-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.db-close{background:none;border:none;font-size:18px;cursor:pointer;color:var(--text3);padding:4px 8px;border-radius:6px;transition:background .15s}
+.db-close:hover{background:var(--surface3);color:var(--text)}
+.db-search{padding:12px 24px;border-bottom:1px solid var(--border);flex-shrink:0}
+.db-search input{width:100%;padding:9px 13px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--surface);color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none}
+.db-search input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+.db-body{flex:1;overflow-y:auto;padding:12px 24px 24px}
+.db-loading{text-align:center;padding:48px 0;color:var(--text3);font-size:13px}
+.db-merchant{border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:10px;background:var(--surface);overflow:hidden}
+.db-merchant-head{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:background .15s}
+.db-merchant-head:hover{background:var(--surface2)}
+.db-merchant-name{font-size:13px;font-weight:600;color:var(--text);text-transform:capitalize}
+.db-merchant-meta{font-size:11px;color:var(--text3);margin-top:2px}
+.db-merchant-right{display:flex;align-items:center;gap:10px}
+.db-count{font-size:11px;font-weight:600;padding:2px 9px;background:var(--accent-dim);color:var(--text);border-radius:10px}
+.db-del{background:none;border:none;font-size:13px;cursor:pointer;color:var(--text3);padding:4px 6px;border-radius:4px;transition:all .15s;opacity:0}
+.db-merchant-head:hover .db-del{opacity:1}
+.db-del:hover{color:var(--red);background:var(--red-dim)}
+.db-emails{border-top:1px solid var(--border);display:none}
+.db-emails.open{display:block}
+.db-email{padding:12px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s}
+.db-email:last-child{border-bottom:none}
+.db-email:hover{background:var(--surface2)}
+.db-email-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px}
+.db-email-type{font-size:11px;font-weight:600;color:var(--text)}
+.db-email-date{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace}
+.db-email-subj{font-size:12px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px}
+.db-email-im{font-size:10px;color:var(--text3)}
+.db-email-ints{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
+.db-email-int{font-size:9px;padding:2px 7px;background:var(--green-dim);color:var(--green);border-radius:10px;font-weight:500}
+/* Preview modal */
+#dbPreview{position:fixed;inset:0;z-index:9000;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,0.4);backdrop-filter:blur(3px)}
+.db-preview-card{background:var(--surface);border-radius:var(--r);width:100%;max-width:640px;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 8px 48px rgba(0,0,0,0.16)}
+.db-preview-head{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;flex-shrink:0}
+.db-preview-title{font-size:14px;font-weight:600;color:var(--text)}
+.db-preview-meta{font-size:11px;color:var(--text3);margin-top:3px}
+.db-preview-body{padding:20px 22px;overflow-y:auto;font-size:13px;line-height:1.7;color:var(--text);white-space:pre-wrap;font-family:'DM Sans',sans-serif}
+.db-empty{text-align:center;padding:48px 0;color:var(--text3);font-size:13px}
 </style>
 </head>
 <body>
@@ -172,6 +217,10 @@ input::placeholder,textarea::placeholder{color:var(--text3)}
       <div class="header-title">IM Copilot</div>
       <div class="header-sub">Tapcart · Implementation email generator</div>
     </div>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <button class="btn-ghost btn-sm" onclick="openDB()" style="font-size:11px;">🗂 Merchant DB</button>
+    <button class="btn-ghost btn-sm" onclick="logout()" style="font-size:11px;">Sign out</button>
   </div>
 </div>
 
@@ -790,6 +839,7 @@ async function saveToHistory(fullOutput){
   const integrations=(im&&im[1].trim().toUpperCase()!=='NONE')?im[1].split(',').map(s=>s.trim()).filter(Boolean):[];
   const entry={
     type:ct,
+    im:authUser||'unknown',
     typeLabel:TL[ct]||(edgeType?EDGE_META[edgeType]?.label:'Email'),
     date:new Date().toISOString(),
     subject:sm?sm[1].trim():'',
@@ -901,5 +951,35 @@ function logout() {
 })();
 
 </script>
+
+<div id="dbOverlay" onclick="closeDB()"></div>
+<div id="dbDrawer">
+  <div class="db-head">
+    <div>
+      <div class="db-title">🗂 Merchant Database</div>
+      <div class="db-sub" id="dbSubtitle">Loading…</div>
+    </div>
+    <button class="db-close" onclick="closeDB()">✕</button>
+  </div>
+  <div class="db-search">
+    <input id="dbSearch" placeholder="Search merchants…" oninput="renderDB()" />
+  </div>
+  <div class="db-body" id="dbBody">
+    <div class="db-loading">Loading merchants…</div>
+  </div>
+</div>
+
+<div id="dbPreview">
+  <div class="db-preview-card">
+    <div class="db-preview-head">
+      <div>
+        <div class="db-preview-title" id="dbPrevTitle"></div>
+        <div class="db-preview-meta" id="dbPrevMeta"></div>
+      </div>
+      <button class="db-close" onclick="closePreview()">✕</button>
+    </div>
+    <div class="db-preview-body" id="dbPrevBody"></div>
+  </div>
+</div>
 </body>
 </html>
