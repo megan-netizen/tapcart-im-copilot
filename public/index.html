@@ -1005,14 +1005,13 @@ function renderDB() {
         +(ints ? '<div class="db-email-ints">'+ints+'</div>' : '')
         +'</div>';
     }).join('');
-    const safeName = m.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
     return '<div class="db-merchant">'
       +'<div class="db-merchant-head" onclick="toggleMerchant('+i+')">'
         +'<div><div class="db-merchant-name">'+m.name+'</div>'
         +'<div class="db-merchant-meta">'+(lastType?'Last: '+lastType:'')+(lastDate?' · '+lastDate:'')+'</div></div>'
         +'<div class="db-merchant-right">'
           +'<span class="db-count">'+m.count+' email'+(m.count!==1?'s':'')+'</span>'
-          +'<button class="db-del" onclick="event.stopPropagation();deleteMerchant(''+safeName+'')">Delete</button>'
+          +'<button class="db-del" data-name="'+m.name.replace(/"/g,'&quot;')+'" onclick="event.stopPropagation();deleteMerchant(this.dataset.name)">Delete</button>'
         +'</div>'
       +'</div>'
       +'<div class="db-emails" id="dbe-'+i+'">'+emailRows+'</div>'
