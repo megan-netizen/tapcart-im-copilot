@@ -19,9 +19,44 @@ async function getHistory(key) {
 export default async function handler(req, res) {
   if (!validateToken(req)) return res.status(401).json({ error: 'Unauthorized' });
 
-  // GET — fetch history for a merchant
+  // GET — fetch history for a merchant, or list all merchants
   if (req.method === 'GET') {
-    const { merchant } = req.query;
+    const { merchant, all } = req.query;
+
+    // List all merchants
+    if (all === 'true') {
+      try {
+        const { blobs } = await list({ prefix: 'merchant-history/' });
+        const merchants = await Promise.all(blobs.map(async blob => {
+          const name = blob.pathname
+            .replace('merchant-history/', '')
+            .replace('.json', '')
+            .replace(/_/g, ' ');
+          const res = await fetch(blob.downloadUrl, {
+            headers: { Authorization: 'Bearer ' + process.env.BLOB_READ_WRITE_TOKEN }
+          });
+          const history = res.ok ? await res.json() : [];
+          return {
+            name,
+            key: blob.pathname,
+            count: history.length,
+            lastEmail: history[0] || null,
+            emails: history
+          };
+        }));
+        // Sort by most recently updated
+        merchants.sort((a, b) => {
+          const da = a.lastEmail?.date ? new Date(a.lastEmail.date) : 0;
+          const db = b.lastEmail?.date ? new Date(b.lastEmail.date) : 0;
+          return db - da;
+        });
+        return res.status(200).json({ merchants });
+      } catch (e) {
+        console.error('[history LIST]', e.message);
+        return res.status(500).json({ error: e.message });
+      }
+    }
+
     if (!merchant) return res.status(400).json({ error: 'merchant param required' });
     try {
       const history = await getHistory(normalizeKey(merchant));
