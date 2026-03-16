@@ -541,7 +541,14 @@ function pickTemplate(type, edgeId){
     $('detectedBadge').innerHTML='✦ Template: <b>'+m.label+'</b>';
     $('edgeHint').textContent=m.hint;
     $('t-edge').placeholder=m.hint;$('t-edge').value='';
-    ['kickoff','submission','golive','quality','handoff','recap','edge','followup'].forEach(t=>t==='edge'?show('f-'+t):hide('f-'+t));
+    // Show cancellation form or generic edge form
+    if(edgeId==='cancellation'){
+      ['kickoff','submission','golive','quality','handoff','recap','edge','followup'].forEach(t=>hide('f-'+t));
+      show('f-cancellation');
+    } else {
+      hide('f-cancellation');
+      ['kickoff','submission','golive','quality','handoff','recap','edge','followup'].forEach(t=>t==='edge'?show('f-'+t):hide('f-'+t));
+    }
     // Re-engage: no next call date; No-show: "Confirmed Next Call"
     if(edgeId==='reengagement'){hide('sdField');}
     else{show('sdField');$('sdLabel').innerHTML=(edgeId==='noshow'?'Confirmed Next Call':'Next Call Date')+' <span class="lopt">(optional)</span>';}
