@@ -299,6 +299,7 @@ input::placeholder,textarea::placeholder{color:var(--text3)}
       <button class="epill" onclick="pickTemplate('edge','techescalation')">🚨 Tech Escalation</button>
       <button class="epill" onclick="pickTemplate('edge','reengagement')">💬 Re-engage</button>
       <button class="epill" onclick="pickTemplate('edge','feedback')">⭐ Feedback</button>
+      <button class="epill" onclick="pickTemplate('edge','cancellation')">🚫 Cancellation</button>
     </div>
   </div>
 </div>
@@ -395,6 +396,46 @@ input::placeholder,textarea::placeholder{color:var(--text3)}
   </div>
   <div id="f-edge" data-h>
     <div class="field"><label>Context / Notes <span class="lopt">(optional)</span></label><div class="hint" id="edgeHint"></div><textarea id="t-edge" rows="6"></textarea></div>
+  </div>
+
+  <div id="f-cancellation" data-h>
+    <div class="field">
+      <label>Options to include</label>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+        <label style="display:flex;align-items:center;gap:8px;text-transform:none;letter-spacing:0;font-size:13px;font-weight:400;color:var(--text);cursor:pointer">
+          <input type="checkbox" id="canOpt1" checked style="width:auto;accent-color:#1C1C14"/> Option 1 — Move forward &amp; launch
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;text-transform:none;letter-spacing:0;font-size:13px;font-weight:400;color:var(--text);cursor:pointer">
+          <input type="checkbox" id="canOpt2" checked style="width:auto;accent-color:#1C1C14"/> Option 2 — Ride out current contract
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;text-transform:none;letter-spacing:0;font-size:13px;font-weight:400;color:var(--text);cursor:pointer">
+          <input type="checkbox" id="canOpt3" style="width:auto;accent-color:#1C1C14" onchange="$('canBuyoutWrap').style.display=this.checked?'block':'none'"/> Option 3 — Contract buyout
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;text-transform:none;letter-spacing:0;font-size:13px;font-weight:400;color:var(--text);cursor:pointer">
+          <input type="checkbox" id="canOpt4" style="width:auto;accent-color:#1C1C14" onchange="$('canFreeWrap').style.display=this.checked?'block':'none';updateTermHint()"/> Option 4 — Fresh contract with free months
+        </label>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="field"><label>Current Monthly Rate</label><input id="canRate" placeholder="e.g. $499"/></div>
+      <div class="field"><label>Contract End Date</label><input id="canEnd" placeholder="e.g. March 2026"/></div>
+    </div>
+    <div id="canBuyoutWrap" class="field" style="display:none">
+      <label>Amount Outstanding (Buyout) <span class="lopt">confirm with finance</span></label>
+      <input id="canBuyout" placeholder="e.g. $2,400"/>
+    </div>
+    <div id="canFreeWrap" class="field" style="display:none">
+      <label>Free Months to Offer</label>
+      <input id="canFree" placeholder="e.g. 3" type="number" min="1" max="12" style="width:120px" oninput="updateTermHint()"/>
+      <div class="hint" id="canTermHint" style="margin-top:6px"></div>
+    </div>
+    <div class="field">
+      <label>Offer a call to discuss? <span class="lopt">(optional)</span></label>
+      <input id="canCall" placeholder="e.g. Thursday at 2pm PT"/>
+    </div>
+    <div class="field"><label>Additional context <span class="lopt">(optional)</span></label>
+      <textarea id="canNotes" rows="3" placeholder="e.g. merchant frustrated with load times, pausing Shopify store..."></textarea>
+    </div>
   </div>
   <div id="f-followup" data-h>
     <div id="fuHistoryWarn" class="err" data-h>No merchant history found. The Follow Up template works best when there are previous emails on file for this merchant. Enter the merchant name above first, or use a different template.</div>
@@ -670,9 +711,19 @@ function mdToHtml(md){
 }
 
 // ── SYSTEM PROMPTS ────────────────────────────────────────────────────────────
+
+function updateTermHint() {
+  const fm = parseInt(v('canFree')) || 0;
+  if (fm > 0) {
+    $('canTermHint').textContent = fm + ' free months + 12 = ' + (fm + 12) + '-month contract total';
+  } else {
+    $('canTermHint').textContent = '';
+  }
+}
 function getEdgeSys(type){
   const base=`You are a Tapcart Implementation Manager writing a follow-up email to a merchant. First person, warm, genuine, and professional. Write like a real person — be personable and thorough without being robotic or overly brief. No filler or fluff, but don't be blunt either. Strike a balance between efficient and human. Never show raw URLs. Always use markdown links [text](url).\n\nOutput ONLY in this exact format. No extra text:\nSUBJECT: [subject line]\nINTEGRATIONS: NONE\n---\n[email body in markdown]\n\nMARKDOWN RULES: ## for headers, **bold**, - bullets, [text](url) for links, blank lines between paragraphs.`;
-  const p={noshow:base+`\n\nTASK: Follow-up email after a no-show. Warm and non-judgmental — things happen, no guilt trip.\nIMPORTANT: If a next call date/time is provided, reference it as a confirmed call already on the calendar (not a proposal). Example: "We still have our call on [date] at [time] — looking forward to connecting then."\nKeep the tone light and supportive. Reiterate that you're here to help and excited to keep things moving.`,techescalation:base+`\n\nTASK: Tech escalation or issue acknowledgment. Calm, accountable, and solution-focused.\nAcknowledge the issue clearly, explain what's being done about it, and give the merchant confidence that it's being handled. Don't be vague — be specific about next steps and timeline if possible.`,reengagement:base+`\n\nTASK: Re-engagement for a merchant who has gone dark. Light, no guilt-trip.\nBe warm and genuine — express that you're still here and ready to pick things back up whenever they are. Briefly remind them where things left off so they have context. Make it easy for them to re-engage.`,feedback:base+`\n\nTASK: Response to positive feedback. Warm, genuine, and appreciative.\nThank them sincerely, acknowledge what they said, and let them know it means a lot. Include a soft ask for a [Shopify review](https://apps.shopify.com/tapcart) — frame it as helping other merchants discover Tapcart.`};
+  const p={noshow:base+`\n\nTASK: Follow-up email after a no-show. Warm and non-judgmental — things happen, no guilt trip.\nIMPORTANT: If a next call date/time is provided, reference it as a confirmed call already on the calendar (not a proposal). Example: "We still have our call on [date] at [time] — looking forward to connecting then."\nKeep the tone light and supportive. Reiterate that you're here to help and excited to keep things moving.`,techescalation:base+`\n\nTASK: Tech escalation or issue acknowledgment. Calm, accountable, and solution-focused.\nAcknowledge the issue clearly, explain what's being done about it, and give the merchant confidence that it's being handled. Don't be vague — be specific about next steps and timeline if possible.`,reengagement:base+`\n\nTASK: Re-engagement for a merchant who has gone dark. Light, no guilt-trip.\nBe warm and genuine — express that you're still here and ready to pick things back up whenever they are. Briefly remind them where things left off so they have context. Make it easy for them to re-engage.`,cancellation:base+`\n\nTASK: Response to a cancellation request. Tone: empathetic and consultative — acknowledge that you heard them, don't be defensive or pushy, but make a genuine case for each option. The goal is to keep them as a customer if possible, but respect their situation.\n\nOPENING: Acknowledge the cancellation request warmly. Thank them for reaching out directly. Express that you want to make sure they have all the options available to make the best decision for their business. Do NOT be apologetic or panicked — be calm, confident, and helpful.\n\nPresent only the options specified in the OPTIONS field below. Number each option clearly.\n\nOPTION 1 — MOVE FORWARD & LAUNCH (if included):\nMake the case for launching. Lead with ROI/RLI — they've already invested time and resources in implementation, and the app is ready to generate returns. Emphasize that the hardest part is done. Reference that mobile apps typically drive strong repeat purchase rates and LTV. Keep it motivating, not guilt-trippy.\n\nOPTION 2 — RIDE OUT CURRENT CONTRACT (if included):\nPresent the option to simply fulfill the remaining contract term at $[MONTHLY_RATE]/month through [CONTRACT_END]. No new commitment. Frame it as the low-pressure path — they keep access through the end of their term and can decide from there.\n\nOPTION 3 — CONTRACT BUYOUT (if included):\nPresent the buyout amount ($[BUYOUT_AMOUNT]) as a clean exit. Acknowledge this is confirmed with the finance team. Be matter-of-fact — this is a real option, not a penalty.\n\nOPTION 4 — FRESH CONTRACT WITH FREE MONTHS (if included):\nPresent the fresh start offer: [FREE_MONTHS] free months, making it a [TOTAL_TERM]-month contract total starting today. Frame it as a chance to reset with breathing room — they get to see real results before the next billing cycle kicks in.\n\nCLOSING: If a call time was provided, offer it as a low-pressure conversation to talk through the options. Keep the close warm — you're on their side and want what's best for their business.\n\nIMPORTANT: Never use aggressive retention language. Never say "I'd hate to see you go" or similar. Be a trusted advisor, not a salesperson.`,
+    feedback:base+`\n\nTASK: Response to positive feedback. Warm, genuine, and appreciative.\nThank them sincerely, acknowledge what they said, and let them know it means a lot. Include a soft ask for a [Shopify review](https://apps.shopify.com/tapcart) — frame it as helping other merchants discover Tapcart.`};
   return p[type]||base;
 }
 
@@ -715,7 +766,30 @@ function buildMsg(){
   if(ct==='quality')msg+=`\n\nTRANSCRIPT:\n${v('t-quality')}`;
   if(ct==='handoff'){if(v('hoAM'))msg+=`\nAM: ${v('hoAM')}`;const hd=fmtDate('hoDate',null);if(hd)msg+=`\nLaunch: ${hd}`;if(v('hoItems'))msg+=`\n\nOutstanding:\n${v('hoItems')}`;}
   if(ct==='recap'){msg+=`\nCall Type: ${v('rcType')}`;if(v('rcRecording'))msg+=`\nRecording: ${v('rcRecording')}`;msg+=`\n\nNOTES:\n${v('t-recap')}`;}
-  if(ct==='edge'){if(edgeType)msg+=`\nTemplate: ${EDGE_META[edgeType]?.label||edgeType}`;if(v('t-edge'))msg+=`\nContext:\n${v('t-edge')}`;}
+  if(ct==='edge'){
+    if(edgeType==='cancellation'){
+      const opts=[];
+      if($('canOpt1')?.checked) opts.push('Option 1: Move forward and launch');
+      if($('canOpt2')?.checked) opts.push('Option 2: Ride out current contract');
+      if($('canOpt3')?.checked) opts.push('Option 3: Contract buyout');
+      if($('canOpt4')?.checked) opts.push('Option 4: Fresh contract with free months');
+      msg+=`\nTemplate: Cancellation Request Response`;
+      msg+=`\nOPTIONS: ${opts.join(', ')}`;
+      if(v('canRate')) msg+=`\nMONTHLY_RATE: ${v('canRate')}`;
+      if(v('canEnd')) msg+=`\nCONTRACT_END: ${v('canEnd')}`;
+      if($('canOpt3')?.checked && v('canBuyout')) msg+=`\nBUYOUT_AMOUNT: ${v('canBuyout')}`;
+      if($('canOpt4')?.checked && v('canFree')){
+        const fm=parseInt(v('canFree'))||0;
+        msg+=`\nFREE_MONTHS: ${fm}`;
+        msg+=`\nTOTAL_TERM: ${fm+12} months`;
+      }
+      if(v('canCall')) msg+=`\nOFFER_CALL: ${v('canCall')}`;
+      if(v('canNotes')) msg+=`\nAdditional context:\n${v('canNotes')}`;
+    } else {
+      if(edgeType) msg+=`\nTemplate: ${EDGE_META[edgeType]?.label||edgeType}`;
+      if(v('t-edge')) msg+=`\nContext:\n${v('t-edge')}`;
+    }
+  }
   if(ct==='followup'){msg+=`\nTone: ${v('fuTone')}`;if(v('fuNotes'))msg+=`\nSpecific items to follow up on:\n${v('fuNotes')}`;else msg+='\nAuto-generate follow-up items from merchant history.';}
   return msg;
 }
@@ -726,11 +800,16 @@ function chk(){
   if(ct==='quality'&&!v('t-quality'))return 'Paste the call transcript or notes.';
   if(ct==='recap'&&!v('t-recap'))return 'Paste the transcript or notes.';
   if(ct==='edge'&&!edgeType)return 'Select an edge case template.';
+  if(ct==='edge'&&edgeType==='cancellation'){
+    const anyOpt=$('canOpt1')?.checked||$('canOpt2')?.checked||$('canOpt3')?.checked||$('canOpt4')?.checked;
+    if(!anyOpt) return 'Please select at least one option to present.';
+    if($('canOpt3')?.checked&&!v('canBuyout')) return 'Please enter the buyout amount for Option 3 (confirm with finance).';
+  }
   if(ct==='followup'&&!merchantHistory.length&&!v('fuNotes'))return 'No merchant history found and no follow-up items specified. Enter the merchant name to load history, or add specific items to follow up on.';
   return null;
 }
 
-const EDGE_META={noshow:{label:'No-show Follow-up',hint:'When was the meeting? How many times rescheduled?'},techescalation:{label:'Tech Escalation',hint:'What went wrong? What does the merchant need?'},reengagement:{label:'Re-engagement',hint:'How long unresponsive? Last known status?'},feedback:{label:'Positive Feedback',hint:'What did they say? Any specific praise?'}};
+const EDGE_META={noshow:{label:'No-show Follow-up',hint:'When was the meeting? How many times rescheduled?'},techescalation:{label:'Tech Escalation',hint:'What went wrong? What does the merchant need?'},reengagement:{label:'Re-engagement',hint:'How long unresponsive? Last known status?'},feedback:{label:'Positive Feedback',hint:'What did they say? Any specific praise?'},cancellation:{label:'Cancellation Request Response',hint:'Fill in the contract details and select which options to present.'}};
 
 const TL={kickoff:'Post Kickoff Email',submission:'App Submission Email',golive:'Go Live Email',quality:'Post Quality Call Email',handoff:'Handoff Email',recap:'Call Recap Email',followup:'Follow Up Email',edge:'Email'};
 const LM={kickoff:'Analyzing transcript...',submission:'Drafting email...',golive:'Drafting email...',quality:'Drafting email...',handoff:'Drafting email...',recap:'Drafting recap...',followup:'Reviewing history & drafting follow-up...',edge:'Drafting email...'};
